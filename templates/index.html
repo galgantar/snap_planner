@@ -27,10 +27,13 @@
       </nav>
       <div class="row">
         <div class="col">
-          <h1>Hello world</h1>
+          <h1>Hello <span style="text-decoration:line-through;">world</span> user</h1>
         </div>
         <div class="col">
-          <h1>just some test text</h1>
+          <h1>your username is: {{ username }}</h1>
+        </div>
+        <div class="col">
+          <a href="/logout">LOGOUT</a>
         </div>
       </div>
   </body>
