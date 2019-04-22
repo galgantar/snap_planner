@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/head.html" %}
+    <title>Register</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/specific/general.css') }}">
+  </head>
+  <body>
+    <h1 class="register-title">Register: </h1>
+
+    <div class="form-container">
+      <form class="main-form" method="POST">
+        <input type="text" name="name" placeholder="Ime">
+        <input type="text" name="surname" placeholder="Priimek">
+        <input type="email" name="email" placeholder="Email">
+        <input type="tel" name="number" placeholder="Številka">
+        <input type="password" name="password" placeholder="Geslo">
+        <input type="password" name="password2" placeholder="Ponovi geslo">
+        <input type="submit" value="Submit">
+      </form>
+      {% if error %}
+      <span class="error">{{ error }}</span>
+      {% endif %}
+
+    </div>
+
+    <p class="register-here">Already have an account? <a href="/razred/login">Login here</a></p>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+/*for non-repeating pages*/
+
+.index-title {
+  width: 100%;
+  text-align: center;
+  margin-top: 10%;
+  font-size: 700%;
+  margin-bottom: 1%;
+}
+.index-paragraph {
+  width: 100%;
+  text-align: center;
+  margin-top: 2%;
+  font-size: 130%;
+}
+
+
+.login-title {
+  width: 100%;
+  text-align: center;
+  margin-top: 8%;
+  font-size: 500%;
+  margin-bottom: 1%;
+}
+.register-title {
+  width: 100%;
+  text-align: center;
+  margin-top: 1%;
+  font-size: 500%;
+  margin-bottom: 1%;
+}
+.main-form {
+  width: 98%;
+  font-family: inherit;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+.main-form input:not(:first-child) {
+  margin-top: 20px;
+}
+.main-form input {
+  width: 100%;
+  height: 40px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 16px;
+}
+.register-here {
+  width: 100%;
+  text-align: center;
+  font-size: 110%;
+}
+.main-form input[type=submit] {
+  width: 50%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  height: 30px;
+  cursor: pointer;
+}
+.error {
+  display: block;
+  width: 100%;
+  color: red;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 110%;
+}
+.form-container {
+  margin-bottom: 1.5%;
+  margin-top: 2%;
+  width: 350px;
+  max-width: 100%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
