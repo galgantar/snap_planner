@@ -1,30 +1,63 @@
 from flask import Flask, render_template, session, request, redirect
+from database import insert_new_user, check_login, confirm_data
 
 app = Flask(__name__)
-app.secret_key = "adadasjfa"
-users = {"Gal":"asuna","Test":"asuna", "Vid":"asuna"}
+app.secret_key = "FHCqR4tvmOpgbYHWXtbe"
 
 @app.route("/")
 def index():
-    if not session.get("user"):
-        return redirect("/login")
-    else:
-        return render_template("index.html", username=session["user"])
+    return render_template("index.html")
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/razred")
+def razred():
+
+    if not session.get("user"):
+        return redirect("/razred/login")
+    else:
+        return render_template("class.html", email=session["user"])
+
+@app.route("/razred/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("register.html")
+
+    elif request.method == "POST":
+        name = request.form.get("name")
+        surname = request.form.get("surname")
+        email = request.form.get("email")
+        number = request.form.get("number")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+
+        if not (name and surname and email and number and password):
+            return render_template("register.html", error="All fields are mandatory")
+
+        if not password == password2:
+            return render_template("register.html", error="Passwords do not match")
+
+        data_validation = confirm_data(name, surname, email, number)
+        if data_validation:
+            return render_template("register.html", error=data_validation)
+        else:
+            insert_new_user(name, surname, password, email, number)
+            return redirect("/razred/login")
+
+@app.route("/razred/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template("login.html")
-    elif request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        if username in users and users[username] == password:
-            session["user"] = username
-            return redirect("/")
-        else:
-            return render_template("login.html", error="Wrong password or username")
 
-@app.route("/logout")
+    elif request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+        if check_login(email, password):
+            session["user"] = email
+            return redirect("/razred")
+        else:
+            return render_template("login.html", error="Wrong username or password")
+
+@app.route("/razred/logout")
 def logout():
     session["user"] = None
     return redirect("/")
