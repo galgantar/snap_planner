@@ -6,7 +6,7 @@ app.secret_key = "FHCqR4tvmOpgbYHWXtbe"
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("pages/index.html")
 
 @app.route("/razred")
 def razred():
@@ -14,12 +14,12 @@ def razred():
     if not session.get("user"):
         return redirect("/razred/login")
     else:
-        return render_template("class.html", email=session["user"])
+        return render_template("pages/class.html", email=session["user"])
 
 @app.route("/razred/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html")
+        return render_template("pages/register.html")
 
     elif request.method == "POST":
         name = request.form.get("name")
@@ -30,14 +30,14 @@ def register():
         password2 = request.form.get("password2")
 
         if not (name and surname and email and number and password):
-            return render_template("register.html", error="All fields are mandatory")
+            return render_template("pages/register.html", error="All fields are mandatory")
 
         if not password == password2:
-            return render_template("register.html", error="Passwords do not match")
+            return render_template("pages/register.html", error="Passwords do not match")
 
         data_validation = confirm_data(name, surname, email, number)
         if data_validation:
-            return render_template("register.html", error=data_validation)
+            return render_template("pages/register.html", error=data_validation)
         else:
             insert_new_user(name, surname, password, email, number)
             return redirect("/razred/login")
@@ -45,7 +45,7 @@ def register():
 @app.route("/razred/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("pages/login.html")
 
     elif request.method == "POST":
         email = request.form.get("email")
@@ -55,12 +55,12 @@ def login():
             session["user"] = email
             return redirect("/razred")
         else:
-            return render_template("login.html", error="Wrong username or password")
+            return render_template("pages/login.html", error="Wrong username or password")
 
 @app.route("/razred/logout")
 def logout():
     session["user"] = None
-    return redirect("/")
+    return redirect("/razred")
 
 if __name__ == "__main__":
     app.run(debug=True)
