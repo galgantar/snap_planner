@@ -51,7 +51,7 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-        if check_login(email, password):
+        if email and password and check_login(email, password):
             session["user"] = email
             return redirect("/razred")
         else:

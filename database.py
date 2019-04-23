@@ -57,7 +57,7 @@ def manual_execute():
 
     cursor.execute(code)
 
-    print(cursor.fetchone())
+    print(cursor.fetchall())
 
     cursor.close()
     connection.commit()
