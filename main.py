@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, request, redirect
-from database import insert_new_user, check_login, confirm_data
+from database import insert_new_user, check_login, confirm_data, user_is_new
 
 app = Flask(__name__)
 app.secret_key = "FHCqR4tvmOpgbYHWXtbe"
@@ -36,8 +36,11 @@ def register():
             return render_template("pages/register.html", error="Passwords do not match")
 
         data_validation = confirm_data(name, surname, email, number)
+        is_new = user_is_new(email)
         if data_validation:
             return render_template("pages/register.html", error=data_validation)
+        elif is_new:
+            return render_template("pages/register.html", error=is_new)
         else:
             insert_new_user(name, surname, password, email, number)
             return redirect("/razred/login")

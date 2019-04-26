@@ -23,6 +23,18 @@ def confirm_data(name, surname, email, number):
 
     return False #No mistakes found
 
+def user_is_new(email):
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""SELECT ID FROM Users WHERE Email = %s;""", (email,))
+    connection.commit()
+
+    if cursor.fetchone() == None:
+        return False #No mistakes found
+    else:
+        return "Account already exists"
+
 def insert_new_user(name, surname, password, email, number):
     connection = establish_connection()
     cursor = connection.cursor()
@@ -42,7 +54,12 @@ def check_login(email, password):
     cursor = connection.cursor()
     cursor.execute("""SELECT Password FROM Users WHERE Email = %s ;""", (email,)) #(x,) forces python to make a touple
     connection.commit()
-    hash = cursor.fetchone()[0]
+
+    response = cursor.fetchone()
+    if not response:
+        return False
+
+    hash = response[0]
     connection.close()
 
     if password and bcrypt.checkpw(password.encode(), hash.encode()):
