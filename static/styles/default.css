@@ -6,9 +6,11 @@ html {
   height: 100%;
   width: 100%;
   font-family: "Courier";
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 body {
   height: 100%;
   width: 100%;
+  font-family: inherit;
 }

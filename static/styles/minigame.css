@@ -1,0 +1,33 @@
+#polje {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  width: 30vw;
+  height: 30vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  box-sizing: content-box;
+}
+#element {
+  width: 30px;
+  height: 30px;
+  background-color: red;
+  margin: auto;
+  margin-top: calc(50% - 30px);
+}
+#gumbi {
+  margin-top: 10px;
+  text-align: center;
+}
+.gumb0 {
+  padding: 5px;
+  font-size: 20px;
+  margin: 5px;
+}
+
+@media(max-width: 800px){
+  #polje {
+    width: 80vw;
+    height: 80vw;
+  }
+}

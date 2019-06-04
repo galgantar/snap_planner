@@ -1,44 +1,50 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home</title>
-
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-
-    <!--Custom-->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/custom.css') }}">
-
+    {% include "blocks/bootstrap.html" %}
+    {% include "blocks/head.html" %}
+    <title>Class</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/minigame.css') }}">
+    <script src="{{ url_for('static', filename='scripts/minigame.js') }}" defer></script>
   </head>
   <body>
-      <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-        <a class="navbar-brand" href="#">Main menu</a>
-        <ul class="navbar-nav">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/razred">galgantar.tk</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">Test</a>
+            <a class="nav-link" href="#">Database</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Test</a>
+            <a class="nav-link" href="#">My profile</a>
           </li>
         </ul>
-      </nav>
-      <div class="row">
-        <div class="col">
-          <h1>Hello <span style="text-decoration:line-through;">world</span> user</h1>
-        </div>
-        <div class="col">
-          <h1>your email is: {{ email }}</h1>
-        </div>
-        <div class="col">
-          <a href="/razred/logout">LOGOUT</a>
-        </div>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="/razred/logout">Logout</a>
+          </li>
+        </ul>
       </div>
+    </nav>
+    <h1 class="welcome">Homepage</h1>
+    <p class="des">No content here, but I added a simple game to keep you busy</p>
+    <div id="wrapper">
+
+      <div id ="polje">
+        <div id="element"></div>
+      </div>
+
+      <div id="gumbi">
+        <button class="gumb0" onclick="levo()">levo</button>
+        <button class="gumb0" onclick="desno()">desno</button>
+        <button class="gumb0" onclick="gor()">gor</button>
+        <button class="gumb0" onclick="dol()">dol</button>
+      </div>
+    </div>
   </body>
 </html>
