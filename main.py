@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, request, redirect
-from database import insert_new_user, check_login, confirm_data, user_is_new
+from database import insert_new_user, check_login, confirm_data, user_is_new, list_database
 
 app = Flask(__name__)
 app.secret_key = "FHCqR4tvmOpgbYHWXtbe"
@@ -64,6 +64,12 @@ def login():
 def logout():
     session["user"] = None
     return redirect("/razred")
+
+@app.route("/razred/database")
+def database():
+    seznam = list_database()
+
+    return render_template("pages/database.html", seznam=seznam)
 
 if __name__ == "__main__":
     app.run(debug=True)

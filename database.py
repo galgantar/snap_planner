@@ -67,6 +67,19 @@ def check_login(email, password):
     else:
         return False
 
+def list_database():
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM Users")
+    response = cursor.fetchall()
+
+    cursor.close()
+    connection.commit()
+    connection.close()
+
+    return response
+
 def manual_execute():
     code = open("query.sql", "r").read()
     connection = establish_connection()
@@ -82,4 +95,5 @@ def manual_execute():
 
 
 if __name__ == "__main__":
+    #list_database()
     manual_execute()

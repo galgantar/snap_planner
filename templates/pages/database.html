@@ -3,7 +3,7 @@
   <head>
     {% include "blocks/bootstrap.html" %}
     {% include "blocks/head.html" %}
-    <title>Class</title>
+    <title>Database</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/minigame.css') }}">
     <script src="{{ url_for('static', filename='scripts/minigame.js') }}" defer></script>
@@ -18,7 +18,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/razred/database">Database</a>
+            <a class="nav-link" href="#">Database</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">My profile</a>
@@ -31,20 +31,8 @@
         </ul>
       </div>
     </nav>
-    <h1 class="welcome">Homepage</h1>
-    <p class="des">No content here, but I added a simple game to keep you busy</p>
-    <div id="wrapper">
-
-      <div id ="polje">
-        <div id="element"></div>
-      </div>
-
-      <div id="gumbi">
-        <button class="gumb0" onclick="levo()">levo</button>
-        <button class="gumb0" onclick="desno()">desno</button>
-        <button class="gumb0" onclick="gor()">gor</button>
-        <button class="gumb0" onclick="dol()">dol</button>
-      </div>
-    </div>
+    {% for id, name, surname, hash, email, number, status in seznam %}
+    <p>{{ name+" "+surname+" "+hash+" "+email+" "+number+" "+status }}</p>
+    {% endfor %}
   </body>
 </html>
