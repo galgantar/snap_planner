@@ -5,8 +5,6 @@
     {% include "blocks/head.html" %}
     <title>Database</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/minigame.css') }}">
-    <script src="{{ url_for('static', filename='scripts/minigame.js') }}" defer></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -18,21 +16,32 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">Database</a>
+            <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">My profile</a>
+            <a class="nav-link" href="/database">Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">My profile</a>
           </li>
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="/razred/logout">Logout</a>
+            <a class="nav-link logout-button" href="/logout">Logout</a>
           </li>
         </ul>
       </div>
     </nav>
-    {% for id, name, surname, hash, email, number, status in seznam %}
-    <p>{{ name+" "+surname+" "+hash+" "+email+" "+number+" "+status }}</p>
+
+    <h1 class="welcome">Seznam uporabnikov</h1>
+
+    {% for id, name, surname, hash, email, number, status, confirmed in seznam %}
+    <div class="user">
+      <h5 class="name">{{ name }} {{ surname }}</h5>
+      <span class="user-info">Email: <a href="{{ 'mailto:'+email }}">{{ email }}</a></span>
+      <span class="user-info">Tel. number: <a href="{{ 'tel:'+number }}">{{ number }}</a></span>
+    </div>
     {% endfor %}
+
   </body>
 </html>
