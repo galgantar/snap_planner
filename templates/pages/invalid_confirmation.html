@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/head.html" %}
+    <meta charset="utf-8">
+    <title>Invalid confirmation</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+  </head>
+  <body>
+    <h1 class="general-title">Invalid confirmation link<h1>
+    <p class="general-paragraph">The confirmation link that you have entered is incorrect or has already been used</p>
+    <p class="general-paragraph"><a href="/">Home</a></p>
+  </body>
+</html>

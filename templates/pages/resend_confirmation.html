@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/head.html" %}
+    <meta charset="utf-8">
+    <title>New confirmation</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+  </head>
+  <body>
+    <h1 class="general-title">New confirmation link<h1>
+    <p class="general-paragraph">The confirmation link has been resend for email {{ email }}.</p>
+    <p class="general-paragraph"><a href="/profile">Home</a></p>
+  </body>
+</html>
