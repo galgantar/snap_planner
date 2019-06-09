@@ -1,5 +1,8 @@
 /*for non-repeating pages*/
 
+a {
+  color: #007bff;
+}
 .index-title {
   width: 100%;
   text-align: center;
@@ -82,8 +85,152 @@
   width: 100%;
   text-align: center;
 }
+.desno:after {
+  content: "desno";
+}
+.gor:after {
+  content: "gor";
+}
+@media (max-width: 400px) {
+  .desno:after {
+    content: "gor";
+  }
+  .gor:after {
+    content: "desno";
+  }
+}
 .des {
   width: 100%;
   text-align: center;
   padding: 0 1%;
+}
+.user {
+  max-width: 100%;
+  padding: 2%;
+  background-color: #dddddd;
+  margin: 2%;
+  overflow-x: hidden;
+  border-radius: 17px;
+}
+.name {
+  font-weight: 600;
+  font-size: 20px;
+}
+.user-info {
+  display: block;
+}
+.user-info-div {
+  width: 75%;
+  margin: auto;
+  background-color: #dddddd;
+  border-radius: 15px;
+  padding: 2%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+.data-row {
+  flex-grow: 1;
+}
+.change-password-row {
+  width: 40%;
+  background-color: white;
+  border-radius: 15px;
+  padding: 2%;
+}
+@media (max-width: 600px) {
+  .user-info-div {
+    flex-direction: column;
+    width: 95%;
+  }
+  .change-password-row {
+    width: 100%;
+  }
+}
+.tag {
+  margin-bottom: -5px;
+  display: block;
+  font-size: 15px;
+}
+.change-data {
+  display: none;
+  font-size: 25px;
+  margin-bottom: 1em;
+}
+.change-data input[type="text"] {
+  width: 60%;
+  border: none;
+  font-weight: 600;
+  line-height: 100%;
+  vertical-align: middle;
+}
+.change-data input[type="submit"] {
+  width: 20%;
+  margin-left: 2%;
+  font-size: 15px;
+  height: 32px;
+  vertical-align: middle;
+}
+.change-button {
+  border: none;
+  background-color: inherit;
+  font-size: 15px;
+  text-decoration: underline;
+  color: #007bff;
+}
+.datapiece {
+  font-weight: 600;
+  font-size: 25px;
+}
+.new-password-form input:not([type=submit]) {
+  display: block;
+  margin: auto;
+  width: 80%;
+  margin-bottom: 5%;
+  height: 40px;
+  transition: 0.5s;
+  text-align: center;
+  border: 0.5px solid black;
+}
+.new-password-form input:focus:not([type=submit]) {
+  outline: none;
+  width: 90%;
+  box-shadow: 2px 3px 5px grey;
+}
+.new-password-form input[type=submit] {
+  width: 50%;
+  display: block;
+  margin: auto;
+  text-align: center;
+  height: 40px;
+}
+.change-password-title {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 9%;
+}
+.profile-error {
+  color: red;
+  width: 100%;
+  display: block;
+  clear: both;
+}
+.logout-button {
+  color: black !important;
+}
+.unconfirmed {
+  margin-top: -1em;
+  font-style: italic;
+}
+.general-title {
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  font-size: 45px;
+}
+.general-paragraph {
+  width: 100%;
+  text-align: center;
+  font-weight: 400;
+  font-size: 25px;
 }
