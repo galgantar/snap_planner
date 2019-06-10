@@ -38,9 +38,9 @@ def send_conformation(receiver_email, confirmation_link):
 
     <p style="color: black">This message was sent because somebody requested to confirm ownership of the following email address {0} on the webpage <a href='http://galgantar.tk'>galgantar.tk</a>.</p>
     <p style="color: black">In order to complete the confirmation, click the link below:</p>
-    <div style="width: 100%; text-align: center;">
-        <a style="display: block; padding: 10px; background-color: #007bff; border-radius: 2px; font-size: 15px; width: max-content; text-decoration: none; color: white;" href='{1}'>Confirm email</a>
-    </div>
+
+    <a style="display: block; padding: 10px; background-color: #007bff; border-radius: 2px; font-size: 15px; width: max-content; text-decoration: none; color: white;" href='{1}'>Confirm email</a>
+
     <p style="color: black">Kind regards,</p>
     <p style="color: black">Gal</p>
     <p style="color: black">P.S. Če si moj sošolc ne sprašuj ampak sam klikn</p>
