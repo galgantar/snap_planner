@@ -1,16 +1,17 @@
-from flask import Flask, render_template, session, request, redirect
+from flask import Flask, render_template, request, redirect, make_response
 from database import insert_new_user, check_login, confirm_data, user_is_new, list_database, get_user_data, change_data, email_conformation, confirm_email
+import os, time
 
 app = Flask(__name__)
-app.secret_key = "FHCqR4tvmOpgbYHWXtbe"
+app.secret_key = os.environ["SECRET_KEY"]
 
 @app.route("/")
 def razred():
-
-    if not session.get("user"):
+    email = request.cookies.get("user")
+    if not email:
         return redirect("/login")
     else:
-        return render_template("pages/class.html", email=session["user"])
+        return render_template("pages/class.html", email=email)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -52,50 +53,63 @@ def login():
         password = request.form.get("password")
 
         if email and password and check_login(email, password):
-            session["user"] = email
-            return redirect("/")
+            response = make_response(redirect("/"))
+            expiration_date = int(time.time()) + 365*24*3600 #Cookies valid for 365 days
+            response.set_cookie("user", email, expires=expiration_date)
+            return response
         else:
             return render_template("pages/login.html", error="Wrong username or password")
 
 @app.route("/logout")
 def logout():
-    session["user"] = None
-    return redirect("/")
+    response = make_response(redirect("/"))
+    response.set_cookie("user", "", expires=0) #Cookie will be expired immediately
+    return response
 
 @app.route("/database")
 def database():
-    seznam = list_database()
-
-    return render_template("pages/database.html", seznam=seznam)
+    if request.cookies.get("user"):
+        seznam = list_database()
+        return render_template("pages/database.html", seznam=seznam)
+    else:
+        return redirect("/")
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if request.method == "GET":
-        data = get_user_data(session["user"])
-        return render_template("pages/profile.html", data=[data])
+        email = request.cookies.get("user")
+        if email:
+            data = get_user_data(email)
+            return render_template("pages/profile.html", data=[data])
+        else:
+            return redirect("/")
 
     elif request.method == "POST":
-        passwords = (request.form.get("password1"), request.form.get("password2"))
-        name = request.form.get("name")
-        surname = request.form.get("surname")
-        number = request.form.get("number")
+        email = request.cookies.get("user")
+        if email:
+            passwords = (request.form.get("password1"), request.form.get("password2"))
+            name = request.form.get("name")
+            surname = request.form.get("surname")
+            number = request.form.get("number")
 
-        if passwords[0] and passwords[0] == passwords[1]:
-            change_data(0, session["user"], passwords[0])
+            if passwords[0] and passwords[0] == passwords[1]:
+                change_data(0, email, passwords[0])
 
-        elif name and not confirm_data(name=name):
-            change_data(1, session["user"], name)
+            elif name and not confirm_data(name=name):
+                change_data(1, email, name)
 
-        elif surname and not confirm_data(surname=surname):
-            change_data(2, session["user"], surname)
+            elif surname and not confirm_data(surname=surname):
+                change_data(2, email, surname)
 
-        elif number and not confirm_data(number=number):
-            change_data(3, session["user"], number)
+            elif number and not confirm_data(number=number):
+                change_data(3, email, number)
+            else:
+                data = get_user_data(email)
+                return render_template("pages/profile.html", data=[data], error="Wrong data")
+
+            return redirect("/profile")
         else:
-            data = get_user_data(session["user"])
-            return render_template("pages/profile.html", data=[data], error="Wrong data")
-
-        return redirect("/profile")
+            return redirect("/") # Sender not logged in
 
 @app.route("/confirmation/<code>")
 def confirmation(code):
@@ -107,8 +121,12 @@ def confirmation(code):
 
 @app.route("/resend")
 def resend():
-    email_conformation(session["user"])
-    return render_template("pages/resend_confirmation.html", email=session["user"])
+    email = request.cookies.get("user")
+    if email:
+        email_conformation(email)
+        return render_template("pages/resend_confirmation.html", email=email)
+    else:
+        return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port="8080")
