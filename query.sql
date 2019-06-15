@@ -15,7 +15,6 @@
     ID SERIAL PRIMARY KEY,
     Email varchar(30) NOT NULL,
     Code varchar(100) NOT NULL,
-    Creation TIMESTAMP NOT NULL
+    Creation TIMESTAMP NOT NULL,
+    Type varchar(15) NOT NULL DEFAULT 'email' <-- default value because of later addition of a column
 );*/
-
-SELECT * FROM Confirmations;
