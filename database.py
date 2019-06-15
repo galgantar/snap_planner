@@ -1,4 +1,4 @@
-from mail import send_conformation
+import mail
 
 def establish_connection():
     import os
@@ -10,7 +10,7 @@ def establish_connection():
 
 def hash_password(password):
     import bcrypt
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt(15))
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt(15)).decode()
 
 def confirm_data(name="a", surname="a", email="g@g.g", number="0"):
     import re
@@ -45,7 +45,7 @@ def insert_new_user(name, surname, password, email, number):
     cursor.execute("""\
                     INSERT INTO Users (Name, Surname, Password, Email, Tel, Role)
                     VALUES(%s, %s, %s, %s, %s, %s);
-                    """, (name, surname, hash_password(password).decode(), email, number, "user"))
+                    """, (name, surname, hash_password(password), email, number, "user"))
 
     cursor.close()
     connection.commit()
@@ -94,11 +94,12 @@ def get_user_data(email):
     return data
 
 def change_data(datatype_index, user_email, data):
+    """Datatype index code: 0 = password, 1 = name, 2 = surname, 3 = telephone"""
     connection = establish_connection()
     cursor = connection.cursor()
 
     if datatype_index == 0:
-        cursor.execute("UPDATE Users SET password = %s WHERE Email = %s", (hash_password(data), user_email))
+        cursor.execute("UPDATE Users SET Password = %s WHERE Email = %s", (hash_password(data), user_email))
     elif datatype_index == 1:
         cursor.execute("UPDATE Users SET Name = %s WHERE Email = %s", (data, user_email))
     elif datatype_index == 2:
@@ -110,8 +111,8 @@ def change_data(datatype_index, user_email, data):
     connection.commit()
     connection.close()
 
-def email_conformation(email):
-    """Creates email validation code"""
+def generate_confirmation_code():
+    """generates random code and returns it with the time of creation"""
     from string import ascii_letters, digits
     from random import choice
     import datetime
@@ -121,15 +122,24 @@ def email_conformation(email):
 
     time = datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
+    return (code, time)
+
+def email_conformation(email):
+    """Sends email confirmation code"""
+    code = generate_confirmation_code()
+
+    confirmation_link = "http://galgantar.tk/confirmation/" + code[0]
+    time = code[1]
+
     connection = establish_connection()
     cursor = connection.cursor()
     cursor.execute("""\
-                INSERT INTO Confirmations (Email, Code, Creation)
-                VALUES (%s, %s, %s)
+                INSERT INTO Confirmations (Email, Code, Creation, Type)
+                VALUES (%s, %s, %s, 'email')
                 """, (email, code, time))
     cursor.close()
 
-    send_conformation(email, confirmation_link)
+    mail.send_conformation(email, confirmation_link)
 
     connection.commit()
     connection.close()
@@ -144,7 +154,7 @@ def confirm_email(code):
     try:
         email = cursor.fetchone()[0]
         cursor.execute("UPDATE Users SET Confirmed = TRUE WHERE Email = %s", (email,))
-        cursor.execute("DELETE FROM Confirmations WHERE Email = %s", (email,))
+        cursor.execute("DELETE FROM Confirmations WHERE Email = %s AND Type = 'email'", (email,))
         cursor.close()
         connection.commit()
         connection.close()
@@ -158,6 +168,46 @@ def confirm_email(code):
     connection.close()
     return False
 
+def reset_password(email):
+    timed_code = generate_confirmation_code()
+    confirmation_link = "http://galgantar.tk/password/" + timed_code[0] +"?email="+ email.replace("@", "<at>")
+    time = timed_code[1]
+
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""\
+                    INSERT INTO Confirmations (Email, Code, Creation, Type)
+                    VALUES (%s, %s, %s, 'password')
+                    """, (email, timed_code[0], time))
+    cursor.close()
+    connection.commit()
+    connection.close()
+
+    mail.send_password_reset(email, confirmation_link)
+
+def check_password_code(email, code):
+    """Validates password reset code"""
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT Email FROM Confirmations WHERE Email = %s AND Code = %s", (email, code))
+
+    try:
+        email = cursor.fetchone()[0]
+        cursor.execute("DELETE FROM Confirmations WHERE Email = %s AND Type = 'password'", (email,))
+        cursor.close()
+        connection.commit()
+        connection.close()
+        return True
+
+    except TypeError:
+        pass
+
+    cursor.close()
+    connection.commit()
+    connection.close()
+    return False
 
 def manual_execute():
     code = open("query.sql", "r").read()
