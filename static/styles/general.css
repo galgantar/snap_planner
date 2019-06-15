@@ -85,20 +85,6 @@ a {
   width: 100%;
   text-align: center;
 }
-.desno:after {
-  content: "desno";
-}
-.gor:after {
-  content: "gor";
-}
-@media (max-width: 400px) {
-  .desno:after {
-    content: "gor";
-  }
-  .gor:after {
-    content: "desno";
-  }
-}
 .des {
   width: 100%;
   text-align: center;
