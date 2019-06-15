@@ -1,4 +1,5 @@
 import mail
+import sys
 
 def establish_connection():
     import os
@@ -209,8 +210,9 @@ def check_password_code(email, code):
     connection.close()
     return False
 
-def manual_execute():
-    code = open("query.sql", "r").read()
+def manual_execute(code=None):
+    if not code:
+        code = open("query.sql", "r").read()
     connection = establish_connection()
     cursor = connection.cursor()
 
@@ -228,5 +230,12 @@ def manual_execute():
 
 
 if __name__ == "__main__":
-    #print(list_database())
-    manual_execute()
+    if sys.argv[0]:
+        if sys.argv[0] == "-u":
+            print(list_database())
+
+        elif sys.argv[0] == "-c":
+            manual_execute("SELECT * FROM Confirmations")
+
+    else:
+        manual_execute()

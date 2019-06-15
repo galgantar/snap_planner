@@ -1,4 +1,4 @@
 web: gunicorn main:app
-clean: python clear_database.py
 
-list: python database.py
+clean: python clear_database.py
+execute: python database.py
