@@ -213,6 +213,7 @@ def check_password_code(email, code):
 def manual_execute(code=None):
     if not code:
         code = open("query.sql", "r").read()
+
     connection = establish_connection()
     cursor = connection.cursor()
 
@@ -230,11 +231,11 @@ def manual_execute(code=None):
 
 
 if __name__ == "__main__":
-    if sys.argv[0]:
-        if sys.argv[0] == "-u":
+    if sys.argv[1]:
+        if sys.argv[1] == "-u":
             print(list_database())
 
-        elif sys.argv[0] == "-c":
+        elif sys.argv[1] == "-c":
             manual_execute("SELECT * FROM Confirmations")
 
     else:
