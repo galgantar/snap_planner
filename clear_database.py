@@ -18,3 +18,5 @@ cursor.execute("""\
 cursor.close()
 connection.commit()
 connection.close()
+
+print("Database cleaned")

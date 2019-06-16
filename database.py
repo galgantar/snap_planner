@@ -231,12 +231,15 @@ def manual_execute(code=None):
 
 
 if __name__ == "__main__":
-    if sys.argv[1]:
-        if sys.argv[1] == "-u":
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "-user":
             print(list_database())
 
-        elif sys.argv[1] == "-c":
+        elif sys.argv[1] == "-confirm":
             manual_execute("SELECT * FROM Confirmations")
 
+        elif sys.argv[1] == "-sql":
+            manual_execute()
+
     else:
-        manual_execute()
+        raise ValueError("Parameter missing for execute process")

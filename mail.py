@@ -73,3 +73,4 @@ def send_password_reset(receiver_email, confirmation_link):
 
 if __name__ == '__main__':
     send_conformation("gantar.gal@gmail.com", "http://test.com")
+    print("Email sent!")
