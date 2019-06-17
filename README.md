@@ -4,28 +4,33 @@ Online schedule web application written in Flask (python) and deployed on Heroku
 Link: [galgantar.tk](http://galgantar.tk)
 
 ## Commands
-Commands (defined in Procfile) used for faster manual process execution
+Commands (defined in `Procfile`) used for faster manual process execution
 
-Manually clean database (process also used for scheduled database cleaning)
+Run unit tests (tests also scheduled):
+```
+heroku run test
+```
+
+Manually clean database (process also used for scheduled database cleaning):
 ```
 heroku run clean
 ```
 
-Manually send email
+Manually send email:
 ```
 heroku run send
 ```
 
 ### Manual database executions:
-List User database
+List User database:
 ```
 heroku run execute -user
 ```
-List Confirmations databae
+List Confirmations database:
 ```
 heroku run execute -confirm
 ```
-Execute query in query.sql
+Execute query in query.sql:
 ```
 heroku run execute -sql
 ```
