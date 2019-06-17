@@ -16,19 +16,19 @@ Manually send email
 heroku run send
 ```
 
-#### Manual database executions:
->List User database
->```
->heroku run execute -user
->```
->List Confirmations databae
->```
->heroku run execute -confirm
->```
->Execute query in query.sql
->```
->heroku run execute -sql
->```
+### Manual database executions:
+List User database
+```
+heroku run execute -user
+```
+List Confirmations databae
+```
+heroku run execute -confirm
+```
+Execute query in query.sql
+```
+heroku run execute -sql
+```
 
 ## Built with
 * [Flask](http://flask.pocoo.org/) (framework)
