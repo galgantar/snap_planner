@@ -10,7 +10,13 @@ Manually clean database (process also used for scheduled database cleaning)
 ```
 heroku run clean
 ```
-Manual database executions:
+
+Manually send email
+```
+heroku run send
+```
+
+#### Manual database executions:
 >List User database
 >```
 >heroku run execute -user
@@ -24,10 +30,6 @@ Manual database executions:
 >heroku run execute -sql
 >```
 
-Manually send email
-```
-heroku run send
-```
 ## Built with
 * [Flask](http://flask.pocoo.org/) (framework)
 * [PostgreSQL](https://www.postgresql.org/) (SQL database)
