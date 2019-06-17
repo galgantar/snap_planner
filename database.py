@@ -233,8 +233,6 @@ def manual_execute(code=None):
 
     cursor.execute(code)
 
-
-
     if cursor.statusmessage.split()[0] == "SELECT":
         response = cursor.fetchall()
         print(response)
@@ -247,12 +245,18 @@ def manual_execute(code=None):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "-user":
-            print(list_database())
+            print("Listing database..."*3)
+            manual_execute("SELECT * FROM Users")
 
         elif sys.argv[1] == "-confirm":
+            print("Listing database...")
             manual_execute("SELECT * FROM Confirmations")
 
-        elif sys.argv[1] == "-sql":
+        elif sys.argv[1] == "-dates":
+            print("Listing database...")
+            manual_execute("SELECT * FROM Dates")
+
+        elif sys.argv[1] == "-file":
             manual_execute()
 
     else:
