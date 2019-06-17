@@ -169,7 +169,21 @@ def confirm_email(code):
     connection.close()
     return False
 
+def user_in_database(email):
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT ID From Users WHERE Email = %s;", (email,))
+
+    if cursor.fetchone != []:
+        return True
+    else:
+        return False
+
 def reset_password(email):
+    if not user_in_database(email):
+        return
+
     timed_code = generate_confirmation_code()
     confirmation_link = "http://galgantar.tk/password/" + timed_code[0] +"?email="+ email.replace("@", "<at>")
     time = timed_code[1]

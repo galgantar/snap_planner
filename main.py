@@ -111,6 +111,10 @@ def profile():
         else:
             return redirect("/") # Sender not logged in
 
+@app.route("/confirmation")
+def incomplete_confirmation():
+    return redirect("/")
+
 @app.route("/confirmation/<code>")
 def confirmation(code):
     if database.confirm_email(code):
@@ -132,9 +136,13 @@ def resend():
 def password():
     if request.method == "GET":
         return render_template("pages/password.html")
+
     elif request.method == "POST":
         email = request.form.get("email")
-        database.reset_password(email)
+
+        if email:
+            database.reset_password(email)
+
         return redirect("/")
 
 @app.route("/password/<code>", methods=["GET", "POST"])
