@@ -3,6 +3,31 @@ Online schedule web application written in Flask (python) and deployed on Heroku
 
 Link: [galgantar.tk](http://galgantar.tk)
 
+## Commands
+Commands (defined in Procfile) used for faster manual process execution
+
+Manually clean database (process also used for scheduled database cleaning)
+```
+heroku run clean
+```
+Manual database executions:
+>List User database
+>```
+>heroku run execute -user
+>```
+>List Confirmations databae
+>```
+>heroku run execute -confirm
+>```
+>Execute query in query.sql
+>```
+>heroku run execute -sql
+>```
+
+Manually send email
+```
+heroku run send
+```
 ## Built with
 * [Flask](http://flask.pocoo.org/) (framework)
 * [PostgreSQL](https://www.postgresql.org/) (SQL database)
