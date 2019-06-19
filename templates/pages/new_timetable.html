@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/bootstrap.html" %}
+    {% include "blocks/head.html" %}
+    <title>Database</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+    <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+  </head>
+  <body>
+    {% include "blocks/nav.html" %}
+
+    <h1 class="welcome">Nov seznam spraševanja</h1>
+
+    <div class="timetable-form-container">
+      <form class="timetable-form" method="post">
+        <input type="text" name="name" placeholder="Predmet">
+        <p>Katere dneve imamo ta predmet?</p>
+        <input type="checkbox" name="day" value="mon"><span class="checkbox-des">Pon</span>
+        <input type="checkbox" name="day" value="tue"><span class="checkbox-des">Tor</span>
+        <input type="checkbox" name="day" value="wed"><span class="checkbox-des">Sre</span>
+        <input type="checkbox" name="day" value="thu"><span class="checkbox-des">Čet</span>
+        <input type="checkbox" name="day" value="fri"><span class="checkbox-des">Pet</span>
+
+        <p>Koliko učencev lahko učitelj vpraša na uro?</p>
+        <input type="number" name="max" value="1">
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+
+  </body>
+</html>

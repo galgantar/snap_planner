@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/bootstrap.html" %}
+    {% include "blocks/head.html" %}
+    <title>Database</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+    <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+  </head>
+  <body>
+    {% include "blocks/nav.html" %}
+
+    <h1 class="welcome">{{ name }}</h1>
+
+    {% for date, emails in data %}
+    <p> {{ date }} {{ emails }}</p>
+    {% endfor %}
+  </body>
+</html>

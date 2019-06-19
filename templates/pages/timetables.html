@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/bootstrap.html" %}
+    {% include "blocks/head.html" %}
+    <title>Database</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+    <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+  </head>
+  <body>
+    {% include "blocks/nav.html" %}
+
+    <h1 class="welcome">Vsi seznami</h1>
+    <a class="add-new" href="/timetables/new">Add timetable</a>
+    {% for id, name, email, creation, max_students, days in data %}
+    <div class="timetable-section">
+      <a class="timetable-name" href="/timetable/{{ name }}">{{ name }}</a>
+      <span class="timetable-creator">Created by: {{ email }}</span>
+    </div>
+    {% endfor %}
+  </body>
+</html>
