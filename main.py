@@ -163,5 +163,43 @@ def new_password(code):
         else:
             return render_template("pages/new_password.html", email=email, error="Expired or incorrect link")
 
+@app.route("/timetables")
+def timetables():
+    if request.cookies.get("user"):
+        data = database.get_timetables()
+        return render_template("pages/timetables.html", data=data)
+    else:
+        return redirect("/")
+
+@app.route("/timetables/new", methods=["GET", "POST"])
+def add_timetable():
+    if request.method == "GET" and request.cookies.get("user"):
+        return render_template("pages/new_timetable.html")
+
+    elif request.method == "POST" and request.cookies.get("user"):
+        name = request.form.get("name")
+        max = request.form.get("max")
+
+        days = request.form.getlist("day")
+        all_days = ["mon", "tue", "wed", "thu", "fri"]
+        days_binary = []
+        for day in all_days:
+            if day in days:
+                days_binary.append("1")
+            else:
+                days_binary.append("0")
+
+        database.new_timetable(name, max, days_binary, request.cookies.get("user"))
+
+        return redirect("/timetables")
+
+@app.route("/timetable/<name>")
+def table(name):
+    if request.cookies.get("user"):
+        data = database.get_timetable_data(name)
+        return render_template("pages/timetable.html", name=name, data=data)
+    else:
+        return redirect("/")
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="8080", debug=True)

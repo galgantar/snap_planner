@@ -112,25 +112,26 @@ def change_data(datatype_index, user_email, data):
     connection.commit()
     connection.close()
 
+def get_current_date():
+    """returns current date"""
+    import datetime
+    return datetime.datetime.utcnow().strftime('%Y-%m-%d')
+
 def generate_confirmation_code():
     """generates random code and returns it with the time of creation"""
     from string import ascii_letters, digits
     from random import choice
-    import datetime
 
     code = "".join([choice(ascii_letters+digits) for i in range(50)])
     confirmation_link = "http://galgantar.tk/confirmation/" + code
 
-    time = datetime.datetime.utcnow().strftime('%Y-%m-%d')
-
-    return (code, time)
+    return code
 
 def email_conformation(email):
     """Sends email confirmation code"""
     code = generate_confirmation_code()
-
-    confirmation_link = "http://galgantar.tk/confirmation/" + code[0]
-    time = code[1]
+    confirmation_link = "http://galgantar.tk/confirmation/" + code
+    time = get_current_date()
 
     connection = establish_connection()
     cursor = connection.cursor()
@@ -193,7 +194,7 @@ def reset_password(email):
 
     cursor.execute("""\
                     INSERT INTO Confirmations (Email, Code, Creation, Type)
-                    VALUES (%s, %s, %s, 'password')
+                    VALUES (%s, %s, %s, 'password');
                     """, (email, timed_code[0], time))
     cursor.close()
     connection.commit()
@@ -224,6 +225,107 @@ def check_password_code(email, code):
     connection.close()
     return False
 
+def get_timetables():
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM Tables ORDER BY CreationDate DESC")
+
+    data = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return data
+
+def new_timetable(name, max, days_binary, creator):
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    creation_date = get_current_date()
+    print(creation_date)
+    cursor.execute("""\
+                    INSERT INTO Tables (Name, Creator, CreationDate, MaxStudents, Days)
+                    VALUES (%s, %s, %s, %s, %s);
+                    """, (name, creator, creation_date, max, "".join(days_binary)))
+    cursor.close()
+    connection.commit()
+    connection.close()
+
+def get_all_dates(day):
+    """returns all dates for a specific day of the week from beginning to the end of the schoolyear"""
+    from datetime import date, datetime, timedelta
+    all_dates = []
+    current_year = datetime.now().year
+
+    if datetime.now().date() > date(current_year, 6, 19): # FIXME: Change to 24 later
+        d = date(current_year, 9, 5) # Start
+        end = date(current_year+1, 6, 15)
+    else:
+        d = date(current_year-1, 9, 5) # Start
+        end = date(current_year, 6, 15)
+
+    d += timedelta(day - d.weekday())
+
+    while d < end:
+        all_dates.append(d)
+        d += timedelta(7)
+
+    return all_dates
+
+def get_timetable_dates(name):
+    import datetime
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT Email, MainDate FROM Dates WHERE Parent = %s ORDER BY MainDate", (name,))
+
+    formetted_dates = {}
+    marked_dates = cursor.fetchall()
+
+    for marked_date in marked_dates:
+        date = marked_date[1].split("-")
+        date = datetime.datetime(date[0], date[1], date[1])
+        formetted_dates[date] =  marked_date[0]
+
+    cursor.close()
+    connection.close()
+
+    return formetted_dates
+
+def get_timetable_properties(name):
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT Days, MaxStudents FROM Tables WHERE Name = %s", (name,))
+    properties = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    return properties
+
+def get_timetable_data(name):
+    taken_dates = get_timetable_dates(name)
+    properties = get_timetable_properties(name)
+    days = list(properties[0])
+
+    final_dates = {}
+
+    for n in range(5):
+        if int(days[n]):
+            dates = get_all_dates(n)
+
+            for date in dates:
+                final_dates[date] = []
+
+    for date in taken_dates:
+        final_dates[date].append(taken_dates[date])
+
+    sorted_dates = sorted(final_dates.items(), key=lambda x: x[0])
+
+    return map(lambda x: (x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates)
+
 def manual_execute(code=None):
     if not code:
         code = open("query.sql", "r").read()
@@ -241,23 +343,19 @@ def manual_execute(code=None):
     connection.commit()
     connection.close()
 
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "-user":
-            print("Listing database..."*3)
+            print("Listing database...", end="\n\n")
             manual_execute("SELECT * FROM Users")
 
         elif sys.argv[1] == "-confirm":
-            print("Listing database...")
+            print("Listing database...", end="\n\n")
             manual_execute("SELECT * FROM Confirmations")
 
         elif sys.argv[1] == "-dates":
-            print("Listing database...")
+            print("Listing database...", end="\n\n")
             manual_execute("SELECT * FROM Dates")
 
-        elif sys.argv[1] == "-file":
-            manual_execute()
-
     else:
-        raise ValueError("Parameter missing for execute process")
+        manual_execute()
