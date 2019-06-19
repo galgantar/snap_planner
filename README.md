@@ -6,7 +6,7 @@ Link: [galgantar.tk](http://galgantar.tk)
 ## Commands
 Commands (defined in `Procfile`) used for faster manual process execution
 
-Run unit tests (tests also scheduled):
+Run unit tests:
 ```
 heroku run test
 ```
@@ -30,9 +30,9 @@ List Confirmations database:
 ```
 heroku run execute -confirm
 ```
-Execute query in query.sql:
+Execute query in query.sql (process is local because it utilizes local file):
 ```
-heroku run execute -sql
+heroku local execute
 ```
 
 ## Built with
