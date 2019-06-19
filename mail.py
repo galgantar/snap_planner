@@ -41,6 +41,8 @@ def send_conformation(receiver_email, confirmation_link):
 
     <a style="display: block; padding: 10px; background-color: #007bff; border-radius: 2px; font-size: 15px; width: max-content; text-decoration: none; color: white;" href='{1}'>Confirm email</a>
 
+    <p>If link is not working follow the URL: {1}</p>
+
     <p style="color: black">Kind regards,</p>
     <p style="color: black">Gal</p>
     <p style="color: black">P.S. Če si moj sošolc ne sprašuj ampak sam klikn</p>
@@ -65,6 +67,7 @@ def send_password_reset(receiver_email, confirmation_link):
 
     <a style="display: block; padding: 10px; background-color: #007bff; border-radius: 2px; font-size: 15px; width: max-content; text-decoration: none; color: white;" href='{1}'>Reset password</a>
 
+    <p>If link is not working follow the URL: {1}</p>
     <p style="color: black">Kind regards,</p>
     <p style="color: black">Gal</p>
             """.format(receiver_email, confirmation_link)
