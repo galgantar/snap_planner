@@ -18,3 +18,19 @@
     Creation TIMESTAMP NOT NULL,
     Type varchar(15) NOT NULL DEFAULT 'email' <-- default value because of later addition of a column
 );*/
+
+/*CREATE TABLE Dates (
+  ID SERIAL PRIMARY KEY,
+  Email varchar(30) NOT NULL,
+  MainDate TIMESTAMP NOT NULL,
+  Parent varchar(30) NOT NULL
+);*/
+
+/*CREATE TABLE Tables (
+  ID SERIAL PRIMARY KEY,
+  Name varchar(30) NOT NULL,
+  Creator varchar(30) NOT NULL,
+  CreationDate TIMESTAMP NOT NULL,
+  MaxStudents INT NOT NULL,
+  Days varchar(5) NOT NULL
+);*/
