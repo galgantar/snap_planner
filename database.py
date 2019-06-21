@@ -34,7 +34,7 @@ def user_is_new(email):
     cursor.execute("""SELECT ID FROM Users WHERE Email = %s;""", (email,))
     connection.commit()
 
-    if cursor.fetchone() == None:
+    if cursor.fetchone() == []:
         return False #No mistakes found
     else:
         return "Account already exists"
@@ -177,13 +177,15 @@ def user_in_database(email):
     cursor.execute("SELECT ID From Users WHERE Email = %s;", (email,))
 
     if cursor.fetchone != []:
+        connection.close()
         return True
     else:
+        connection.close()
         return False
 
 def reset_password(email):
     if not user_in_database(email):
-        return
+        return False
 
     timed_code = generate_confirmation_code()
     confirmation_link = "http://galgantar.tk/password/" + timed_code[0] +"?email="+ email.replace("@", "<at>")
@@ -229,7 +231,12 @@ def get_timetables():
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM Tables ORDER BY CreationDate DESC")
+    cursor.execute("""\
+                    SELECT Tables.Name, Users.Name, Users.Surname
+                    FROM Tables INNER JOIN Users
+                    ON Tables.Creator = Users.Email
+                    ORDER BY CreationDate DESC
+                    """)
 
     data = cursor.fetchall()
 
@@ -238,16 +245,16 @@ def get_timetables():
 
     return data
 
-def new_timetable(name, max, days_binary, creator):
+def new_timetable(name, days_binary, creator):
     connection = establish_connection()
     cursor = connection.cursor()
 
     creation_date = get_current_date()
-    print(creation_date)
+
     cursor.execute("""\
-                    INSERT INTO Tables (Name, Creator, CreationDate, MaxStudents, Days)
-                    VALUES (%s, %s, %s, %s, %s);
-                    """, (name, creator, creation_date, max, "".join(days_binary)))
+                    INSERT INTO Tables (Name, Creator, CreationDate, Days)
+                    VALUES (%s, %s, %s, %s);
+                    """, (name, creator, creation_date, "".join(days_binary)))
     cursor.close()
     connection.commit()
     connection.close()
@@ -278,26 +285,30 @@ def get_timetable_dates(name):
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT Email, MainDate FROM Dates WHERE Parent = %s ORDER BY MainDate", (name,))
+    cursor.execute("""\
+                    SELECT Dates.MainDate, Users.Name, Users.Surname
+                    FROM Dates INNER JOIN Users
+                    ON Dates.Email = Users.Email
+                    WHERE Dates.Parent = %s
+                    ORDER BY Dates.MainDate""", (name,))
 
-    formetted_dates = {}
+    formatted_dates = {}
     marked_dates = cursor.fetchall()
 
     for marked_date in marked_dates:
-        date = marked_date[1].split("-")
-        date = datetime.datetime(date[0], date[1], date[1])
-        formetted_dates[date] =  marked_date[0]
+        date = marked_date[0].date()
+        formatted_dates[date] =  marked_date[1]+" "+marked_date[2]
 
     cursor.close()
     connection.close()
 
-    return formetted_dates
+    return formatted_dates
 
 def get_timetable_properties(name):
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT Days, MaxStudents FROM Tables WHERE Name = %s", (name,))
+    cursor.execute("SELECT Days FROM Tables WHERE Name = %s", (name,))
     properties = cursor.fetchone()
 
     cursor.close()
@@ -305,11 +316,10 @@ def get_timetable_properties(name):
 
     return properties
 
-def get_timetable_data(name):
+def get_timetable_data(name, email):
     taken_dates = get_timetable_dates(name)
     properties = get_timetable_properties(name)
-    days = list(properties[0])
-
+    days = properties[0]
     final_dates = {}
 
     for n in range(5):
@@ -319,12 +329,52 @@ def get_timetable_data(name):
             for date in dates:
                 final_dates[date] = []
 
-    for date in taken_dates:
-        final_dates[date].append(taken_dates[date])
+    for date in final_dates:
+        if date in taken_dates.keys():
+            final_dates[date].append(taken_dates[date])
 
     sorted_dates = sorted(final_dates.items(), key=lambda x: x[0])
 
-    return map(lambda x: (x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates)
+    slo_weekdays = ["Pon", "Tor", "Sre", "Čet", "Pet"]
+
+    return map(lambda x: (slo_weekdays[x[0].weekday()], x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates) # Returns list (map) of tuples
+
+def check_date_submission(email, parent):
+    """Checks if submission for timetable already exists"""
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM Dates WHERE Email = %s and Parent = %s", (email, parent))
+
+    response = cursor.fetchall()
+
+    if response == []:
+        return False # No submissions found - OK
+    else:
+        return response[0].strftime("%d.%m.%Y")
+
+def add_date(email, date, parent):
+    check_submission = check_date_submission(email, parent)
+    if check_date_submission:
+        return "You have already submitted for a different date: {}".format(check_submission)
+
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    date = date.split(".")
+    date.reverse()
+    date = "-".join(date)
+
+    cursor.execute("""\
+                    INSERT INTO Dates (Email, MainDate, Parent)
+                    VALUES (%s, %s, %s);
+                    """, (email, date, parent))
+
+    cursor.close()
+    connection.commit()
+    connection.close()
+
+    return False # No mistakes found
 
 def manual_execute(code=None):
     if not code:
@@ -346,16 +396,19 @@ def manual_execute(code=None):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         if sys.argv[1] == "-user":
-            print("Listing database...", end="\n\n")
+            print("Listing database...", end="\n\n", file=sys.stderr)
             manual_execute("SELECT * FROM Users")
 
         elif sys.argv[1] == "-confirm":
-            print("Listing database...", end="\n\n")
+            print("Listing database...", end="\n\n", file=sys.stderr)
             manual_execute("SELECT * FROM Confirmations")
 
         elif sys.argv[1] == "-dates":
-            print("Listing database...", end="\n\n")
+            print("Listing database...", end="\n\n", file=sys.stderr)
             manual_execute("SELECT * FROM Dates")
 
+        elif sys.argv[1] == "-tables":
+            print("Listing database...", end="\n\n", file=sys.stderr)
+            manual_execute("SELECT * FROM Tables")
     else:
         manual_execute()
