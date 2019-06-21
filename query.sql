@@ -31,6 +31,5 @@
   Name varchar(30) NOT NULL,
   Creator varchar(30) NOT NULL,
   CreationDate TIMESTAMP NOT NULL,
-  MaxStudents INT NOT NULL,
   Days varchar(5) NOT NULL
 );*/
