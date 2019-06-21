@@ -9,11 +9,28 @@
   </head>
   <body>
     {% include "blocks/nav.html" %}
-
     <h1 class="welcome">{{ name }}</h1>
 
-    {% for date, emails in data %}
-    <p> {{ date }} {{ emails }}</p>
+    {% for weekday, date, names in data %}
+
+    <div class="date">
+      <p class="date-weekday">{{ weekday }}.</p> <p class="date-date">{{ date }}</p>
+
+      {% for name in names %}
+      <span class="date-name">{{ name }}</span>
+      {% endfor %}
+
+      <div class="date-input background-add" title="Add me to this date">
+        <form class="date-form" method="post">
+          <input type="text" name="date" value="{{ date }}">
+          <input type="submit" value="">
+        </form>
+      </div>
+    </div>
     {% endfor %}
+
+  {% if error %}
+  <script>alert('{{ error }}')</script>
+  {% endif %}
   </body>
 </html>
