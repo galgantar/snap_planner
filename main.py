@@ -41,7 +41,7 @@ def register():
         else:
             database.insert_new_user(name, surname, password, email, number)
             database.email_conformation(email) #send confirmation link
-            return redirect("/login")
+            return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -148,6 +148,8 @@ def password():
 @app.route("/password/<code>", methods=["GET", "POST"])
 def new_password(code):
     email = request.args.get("email").replace("<at>", "@")
+    if not email:
+        return redirect("/")
 
     if request.method == "GET":
         return render_template("pages/new_password.html", email=email)
@@ -156,7 +158,7 @@ def new_password(code):
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        if database.check_password_code(email, code) and password1 == password2:
+        if password1 == password2 and database.check_password_code(email, code):
             database.change_data(0, email, password1)
             return redirect("/")
 
@@ -178,7 +180,6 @@ def add_timetable():
 
     elif request.method == "POST" and request.cookies.get("user"):
         name = request.form.get("name")
-        max = request.form.get("max")
 
         days = request.form.getlist("day")
         all_days = ["mon", "tue", "wed", "thu", "fri"]
@@ -189,17 +190,30 @@ def add_timetable():
             else:
                 days_binary.append("0")
 
-        database.new_timetable(name, max, days_binary, request.cookies.get("user"))
+        database.new_timetable(name, days_binary, request.cookies.get("user"))
 
         return redirect("/timetables")
 
-@app.route("/timetable/<name>")
+@app.route("/timetable/<name>", methods=["GET", "POST"])
 def table(name):
-    if request.cookies.get("user"):
-        data = database.get_timetable_data(name)
-        return render_template("pages/timetable.html", name=name, data=data)
-    else:
+    email = request.cookies.get("user")
+    if not email:
         return redirect("/")
+
+    if request.method == "GET":
+        data = database.get_timetable_data(name, email)
+        return render_template("pages/timetable.html", name=name, data=data)
+
+    elif request.method == "POST":
+        date = request.form.get("date")
+
+        error = database.add_date(email, date, name)
+
+        if error:
+            data = database.get_timetable_data(name, email)
+            return render_template("pages/timetable.html", name=name, data=data, error=error)
+        else:
+            return redirect("/timetable/{}".format(name))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="8080", debug=True)
