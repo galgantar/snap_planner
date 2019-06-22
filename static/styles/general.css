@@ -1,6 +1,9 @@
 a {
   color: #007bff;
 }
+input:focus {
+  outline: none;
+}
 .index-title {
   width: 100%;
   text-align: center;
@@ -312,8 +315,15 @@ a {
   width: 25px;
   height: 25px;
 }
+.date-input:hover {
+  cursor: pointer;
+}
 .background-add {
   background: url("../images/add.svg");
+  background-repeat: no-repeat;
+}
+.background-remove {
+  background: url("../images/remove.svg");
   background-repeat: no-repeat;
 }
 .date-icon {

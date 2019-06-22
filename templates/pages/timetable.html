@@ -20,12 +20,21 @@
       <span class="date-name">{{ name }}</span>
       {% endfor %}
 
-      <div class="date-input background-add" title="Add me to this date">
+      {% if date == myDate %}
+      <div class="date-input background-remove" title="Remove me from this date">
         <form class="date-form" method="post">
-          <input type="text" name="date" value="{{ date }}">
+          <input type="text" name="remove-date" value="{{ date }}">
           <input type="submit" value="">
         </form>
       </div>
+      {% else %}
+      <div class="date-input background-add" title="Add me to this date">
+        <form class="date-form" method="post">
+          <input type="text" name="add-date" value="{{ date }}">
+          <input type="submit" value="">
+        </form>
+      </div>
+    {% endif %}
     </div>
     {% endfor %}
 
