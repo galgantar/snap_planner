@@ -30,6 +30,14 @@ List Confirmations database:
 ```
 heroku run execute -confirm
 ```
+List Dates database:
+```
+heroku run execute -dates
+```
+List Tables database:
+```
+heroku run execute -tables
+```
 Execute query in query.sql (process is local because it utilizes local file):
 ```
 heroku local execute
