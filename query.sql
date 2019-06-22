@@ -7,7 +7,7 @@
     Password varchar(60) NOT NULL,
     Email varchar(30) NOT NULL,
     Tel varchar(20) NOT NULL,
-    Role varchar(20) NOT NULL
+    Role varchar(20) NOT NULL,
     Confirmed BOOLEAN NOT NULL DEFAULT FALSE
 );*/
 
@@ -23,7 +23,8 @@
   ID SERIAL PRIMARY KEY,
   Email varchar(30) NOT NULL,
   MainDate TIMESTAMP NOT NULL,
-  Parent varchar(30) NOT NULL
+  Parent varchar(30) NOT NULL,
+  Active BOOLEAN NOT NULL DEFAULT FALSE <-- default value because of later addition of a column
 );*/
 
 /*CREATE TABLE Tables (
