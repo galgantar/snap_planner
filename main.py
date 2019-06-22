@@ -195,23 +195,31 @@ def add_timetable():
         return redirect("/timetables")
 
 @app.route("/timetable/<name>", methods=["GET", "POST"])
-def table(name):
+def table(name, error=None):
     email = request.cookies.get("user")
     if not email:
         return redirect("/")
 
     if request.method == "GET":
         data = database.get_timetable_data(name, email)
-        return render_template("pages/timetable.html", name=name, data=data)
+        dates_array = data[0]
+        myDate = data[1]
+        return render_template("pages/timetable.html", name=name, data=dates_array, myDate=myDate)
 
     elif request.method == "POST":
-        date = request.form.get("date")
+        add_date = request.form.get("add-date")
+        remove_date = request.form.get("remove-date")
 
-        error = database.add_date(email, date, name)
+        if add_date:
+            error = database.add_date(email, add_date, name)
+        elif remove_date:
+            database.remove_date(email, remove_date, name)
 
         if error:
             data = database.get_timetable_data(name, email)
-            return render_template("pages/timetable.html", name=name, data=data, error=error)
+            dates_array = data[0]
+            myDate = data[1]
+            return render_template("pages/timetable.html", name=name, data=dates_array, myDate=myDate, error=error)
         else:
             return redirect("/timetable/{}".format(name))
 

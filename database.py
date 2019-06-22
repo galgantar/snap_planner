@@ -34,7 +34,7 @@ def user_is_new(email):
     cursor.execute("""SELECT ID FROM Users WHERE Email = %s;""", (email,))
     connection.commit()
 
-    if cursor.fetchone() == []:
+    if cursor.rowcount == 0:
         return False #No mistakes found
     else:
         return "Account already exists"
@@ -176,7 +176,7 @@ def user_in_database(email):
 
     cursor.execute("SELECT ID From Users WHERE Email = %s;", (email,))
 
-    if cursor.fetchone != []:
+    if cursor.rowcount != 0:
         connection.close()
         return True
     else:
@@ -280,7 +280,7 @@ def get_all_dates(day):
 
     return all_dates
 
-def get_timetable_dates(name):
+def get_timetable_dates(parent, email):
     import datetime
     connection = establish_connection()
     cursor = connection.cursor()
@@ -289,8 +289,8 @@ def get_timetable_dates(name):
                     SELECT Dates.MainDate, Users.Name, Users.Surname
                     FROM Dates INNER JOIN Users
                     ON Dates.Email = Users.Email
-                    WHERE Dates.Parent = %s
-                    ORDER BY Dates.MainDate""", (name,))
+                    WHERE Dates.Parent = %s AND Dates.Active = TRUE
+                    ORDER BY Dates.MainDate""", (parent,))
 
     formatted_dates = {}
     marked_dates = cursor.fetchall()
@@ -299,10 +299,17 @@ def get_timetable_dates(name):
         date = marked_date[0].date()
         formatted_dates[date] =  marked_date[1]+" "+marked_date[2]
 
+    cursor.execute("SELECT MainDate FROM Dates WHERE Parent = %s AND Email = %s AND Active = TRUE", (parent, email))
+
+    if cursor.rowcount == 0:
+        myDate = None
+    else:
+        myDate = cursor.fetchone()[0]
+
     cursor.close()
     connection.close()
 
-    return formatted_dates
+    return formatted_dates, myDate
 
 def get_timetable_properties(name):
     connection = establish_connection()
@@ -317,7 +324,13 @@ def get_timetable_properties(name):
     return properties
 
 def get_timetable_data(name, email):
-    taken_dates = get_timetable_dates(name)
+    data = get_timetable_dates(name, email)
+    taken_dates = data[0]
+    if data[1]:
+        myDate = data[1].strftime("%d.%m.%Y")
+    else:
+        myDate = None
+
     properties = get_timetable_properties(name)
     days = properties[0]
     final_dates = {}
@@ -337,25 +350,25 @@ def get_timetable_data(name, email):
 
     slo_weekdays = ["Pon", "Tor", "Sre", "Čet", "Pet"]
 
-    return map(lambda x: (slo_weekdays[x[0].weekday()], x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates) # Returns list (map) of tuples
+    return map(lambda x: (slo_weekdays[x[0].weekday()], x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates), myDate # Returns list (map) of tuples + myDate
 
 def check_date_submission(email, parent):
     """Checks if submission for timetable already exists"""
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM Dates WHERE Email = %s and Parent = %s", (email, parent))
+    cursor.execute("SELECT MainDate FROM Dates WHERE Email = %s and Parent = %s AND Active = TRUE", (email, parent))
 
-    response = cursor.fetchall()
+    response = cursor.fetchone()
 
-    if response == []:
+    if cursor.rowcount == 0:
         return False # No submissions found - OK
     else:
         return response[0].strftime("%d.%m.%Y")
 
 def add_date(email, date, parent):
     check_submission = check_date_submission(email, parent)
-    if check_date_submission:
+    if check_submission:
         return "You have already submitted for a different date: {}".format(check_submission)
 
     connection = establish_connection()
@@ -366,8 +379,8 @@ def add_date(email, date, parent):
     date = "-".join(date)
 
     cursor.execute("""\
-                    INSERT INTO Dates (Email, MainDate, Parent)
-                    VALUES (%s, %s, %s);
+                    INSERT INTO Dates (Email, MainDate, Parent, Active)
+                    VALUES (%s, %s, %s, TRUE);
                     """, (email, date, parent))
 
     cursor.close()
@@ -375,6 +388,24 @@ def add_date(email, date, parent):
     connection.close()
 
     return False # No mistakes found
+
+def remove_date(email, date, parent):
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    date = date.split(".")
+    date.reverse()
+    date = "-".join(date)
+
+    cursor.execute("""\
+                    UPDATE Dates
+                    SET Active = FALSE
+                    WHERE Email = %s AND MainDate = %s AND Parent = %s
+                    """, (email, date, parent))
+
+    cursor.close()
+    connection.commit()
+    connection.close()
 
 def manual_execute(code=None):
     if not code:
@@ -387,7 +418,7 @@ def manual_execute(code=None):
 
     if cursor.statusmessage.split()[0] == "SELECT":
         response = cursor.fetchall()
-        print(response)
+        print(response, file=sys.stderr)
 
     cursor.close()
     connection.commit()
