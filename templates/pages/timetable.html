@@ -16,9 +16,11 @@
     <div class="date">
       <p class="date-weekday">{{ weekday }}.</p> <p class="date-date">{{ date }}</p>
 
+      <div class="names-section">
       {% for name in names %}
       <span class="date-name">{{ name }}</span>
       {% endfor %}
+      </div>
 
       {% if date == myDate %}
       <div class="date-input background-remove" title="Remove me from this date">

@@ -3,7 +3,7 @@
   <head>
     {% include "blocks/bootstrap.html" %}
     {% include "blocks/head.html" %}
-    <title>Database</title>
+    <title>Profile</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
     <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
   </head>
@@ -20,21 +20,21 @@
           <p class="datapiece">{{ name }}<button class="change-button" onclick="showForm(0)">change</button></p>
           <form class="change-data" action="/profile" method="post">
             <input type="text" name="name" value="{{ name }}">
-            <input type="submit" value="Shrani">
+            <input class="add-new" type="submit" value="Shrani">
           </form>
 
           <span class="tag">Surname:</span>
           <p class="datapiece">{{ surname }}<button class="change-button" onclick="showForm(1)">change</button></p>
           <form class="change-data" action="/profile" method="post">
             <input type="text" name="surname" value="{{ surname }}">
-            <input type="submit" value="Shrani">
+            <input class="add-new" type="submit" value="Shrani">
           </form>
 
           <span class="tag">Telephone:</span>
           <p class="datapiece">{{ number }}<button class="change-button" onclick="showForm(2)">change</button></p>
           <form class="change-data" action="/profile" method="post">
             <input type="text" name="number" value="{{ number }}">
-            <input type="submit" value="Shrani">
+            <input class="add-new" type="submit" value="Shrani">
           </form>
 
           <span class="tag">Email:</span>
@@ -53,7 +53,7 @@
           <form class="new-password-form" action="/profile" method="post">
             <input type="password" name="password1" placeholder="Password">
             <input type="password" name="password2" placeholder="Repeat password">
-            <input type="submit" value="Submit">
+            <input class="add-new" type="submit" value="Submit">
           </form>
         </div>
       </div>

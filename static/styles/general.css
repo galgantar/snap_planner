@@ -1,9 +1,26 @@
 a {
   color: #007bff;
 }
+nav {
+  background-color: #007bff;
+  box-shadow: 0px 1px 3px grey;
+  position: fixed !important;
+  width: 100%;
+  top: 0;
+  z-index: 3;
+}
 input:focus {
   outline: none;
 }
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 .index-title {
   width: 100%;
   text-align: center;
@@ -79,6 +96,7 @@ input:focus {
   transform: translateX(-50%);
 }
 .welcome {
+  margin-top: 65px;
   font-size: 50px;
   font-weight: 500;
   width: 100%;
@@ -92,7 +110,7 @@ input:focus {
 .user {
   max-width: 98%;
   padding: 2%;
-  background-color: #dddddd;
+  background-color: #eeeeee;
   margin: 2%;
   overflow-x: hidden;
   border-radius: 17px;
@@ -107,7 +125,7 @@ input:focus {
 .user-info-div {
   width: 75%;
   margin: auto;
-  background-color: #dddddd;
+  background-color: #eeeeee;
   border-radius: 15px;
   padding: 2%;
   display: flex;
@@ -200,9 +218,6 @@ input:focus {
   display: block;
   clear: both;
 }
-.logout-button {
-  color: black !important;
-}
 .unconfirmed {
   margin-top: -1em;
   font-style: italic;
@@ -226,7 +241,7 @@ input:focus {
   max-width: 96%;
   margin-left: 50%;
   transform: translateX(-50%);
-  background-color: #dddddd;
+  background-color: #eeeeee;
   text-align: center;
   border-radius: 15px;
   padding: 2%;
@@ -272,7 +287,7 @@ input:focus {
   margin-top: 2%;
 }
 .timetable-section {
-  background-color: #dddddd;
+  background-color: #eeeeee;
   border-radius: 12px;
   padding: 1%;
   margin: 1%;
@@ -281,8 +296,12 @@ input:focus {
 .timetable-name {
   font-size: 20px;
   font-weight: 600;
-  text-decoration: underline;
   color: black;
+  transition: 0.4s;
+  margin-bottom: 0;
+}
+.timetable-section:hover > .timetable-name {
+  font-size: 28px;
 }
 .timetable-creator {
   position: absolute;
@@ -293,27 +312,33 @@ input:focus {
 .date {
   margin: 1%;
   padding: 1%;
-  background-color: #dddddd;
+  background-color: #eeeeee;
   border-radius: 10px;
+  position: relative;
 }
 .date-weekday {
   display: inline-block;
   width: auto;
   font-style: italic;
   margin-bottom: 0;
+  font-weight: 600;
 }
 .date-date {
   display: inline-block;
   width: auto;
   font-style: italic;
   margin-bottom: 0;
+  font-weight: 600;
 }
 .date-input {
   display: inline-block;
   float: right;
-  position: relative;
   width: 25px;
   height: 25px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .date-input:hover {
   cursor: pointer;
@@ -344,4 +369,73 @@ input:focus {
 }
 .date-form input[type="text"] {
   display: none;
+}
+.calendar {
+  width: 20px;
+  height: auto;
+}
+.add-new {
+  margin: 1%;
+  padding: 0.5%;
+  text-decoration: none;
+  border-radius: 10px;
+  border: 2px solid #007bff;
+  transition: 0.3s;
+  background-color: white;
+  color: #007bff;
+  background-color: inherit;
+}
+.p-1 {
+  padding: 1%;
+}
+.add-new:hover {
+  color: white;
+  background-color: #007bff;
+  text-decoration: none;
+}
+.nav-link {
+  color: white;
+  transition: 0.3s;
+}
+.nav-link:hover {
+  color: rgba(255,255,255,0.7);
+}
+.navbar-brand {
+  color: white !important;
+  font-weight: 900;
+}
+.logout-button {
+  color: white !important;
+}
+.wrap-link {
+  display: contents;
+  padding: 0;
+  color: black;
+}
+.wrap-link:hover {
+  text-decoration: none;
+  color: black;
+}
+.names-section {
+  display: inline-block;
+  margin-left: 2%;
+  width: calc(100% - 170px) !important;
+  width: fit-content;
+}
+@media (max-width: 600px) {
+  div.names-section {
+    display: block;
+    margin-left: 0;
+    width: 90% !important;
+  }
+}
+
+.date-name {
+  white-space: nowrap;
+}
+.navbar-toggler {
+  border: 2px solid white !important;
+}
+.navbar-toggler-icon {
+  background-image: url("../images/dropdown.svg");
 }
