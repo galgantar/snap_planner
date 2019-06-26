@@ -13,7 +13,7 @@ def deleteOldConfirmations():
 
     cursor.execute("""\
                     DELETE FROM Confirmations
-                    WHERE Creation < %s;
+                    WHERE Creation < %s OR Active = 'False';
                     """, (formatted_time,))
 
     cursor.close()
@@ -30,7 +30,7 @@ def deleteUnactiveDates():
 
     cursor.execute("""\
                     DELETE FROM Dates
-                    WHERE Active = FALSE
+                    WHERE Active = FALSE;
                     """)
     cursor.close()
     connection.commit()
