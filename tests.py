@@ -59,9 +59,31 @@ class Test(unittest.TestCase):
 
     def testPasswordCode(self):
         response = self.app.get("/password/test?email=test.test<at>gmail.com")
-        assert response.status_code == 200
+        assert response.status_code == 302
 
         post_response = self.app.post("/password/test?email=test.test<at>gmail.com", data={"password1":"123", "password2":"123"})
-        assert response.status_code == 200
+        assert response.status_code == 302
+
+    def testTimetablesListing(self):
+        response = self.app.get("/timetables")
+        assert response.status_code == 302
+
+    def testTimetableAdd(self):
+        response = self.app.get("/timetables/new")
+        assert response.status_code == 302
+
+        post_response = self.app.post("/timetables/new", data={"name":"test", "day":"wed"})
+        assert post_response.status_code == 302
+
+    def testTimetable(self):
+        response = self.app.get("/timetable/never_used_name")
+        assert response.status_code == 302
+
+        post_response = self.app.get("/timetable/never_used_name")
+        assert post_response.status_code == 302
+
+    def testMyDates(self):
+        response = self.app.get("/mydates")
+        assert response.status_code == 302
 
 unittest.main()
