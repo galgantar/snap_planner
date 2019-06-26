@@ -32,16 +32,18 @@ def register():
         if not password == password2:
             return render_template("pages/register.html", error="Passwords do not match")
 
+        if not database.user_is_new(email):
+            return render_template("pages/register.html", error="Account already exists")
+
         data_validation = database.confirm_data(name, surname, email, number)
-        is_new = database.user_is_new(email)
+
         if data_validation:
             return render_template("pages/register.html", error=data_validation)
-        elif is_new:
-            return render_template("pages/register.html", error=is_new)
+
         else:
             database.insert_new_user(name, surname, password, email, number)
             database.email_conformation(email) #send confirmation link
-            return redirect("/")
+            return redirect("/login")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -63,57 +65,54 @@ def login():
 @app.route("/logout")
 def logout():
     response = make_response(redirect("/"))
-    response.set_cookie("user", "", expires=0) #Cookie will be expired immediately
+    response.set_cookie("user", "", expires=0) #Cookie will become expired immediately
     return response
 
 @app.route("/database")
 def list_database():
     if request.cookies.get("user"):
-        seznam = database.list_database()
-        return render_template("pages/database.html", seznam=seznam)
+        data = database.list_database()
+        return render_template("pages/database.html", data=data)
     else:
         return redirect("/")
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
+    email = request.cookies.get("user")
+    if not email:
+        return redirect("/login")
+
     if request.method == "GET":
-        email = request.cookies.get("user")
-        if email:
-            data = database.get_user_data(email)
-            return render_template("pages/profile.html", data=[data])
-        else:
-            return redirect("/")
+        data = database.get_user_data(email)
+        return render_template("pages/profile.html", data=data)
 
     elif request.method == "POST":
-        email = request.cookies.get("user")
-        if email:
-            passwords = (request.form.get("password1"), request.form.get("password2"))
-            name = request.form.get("name")
-            surname = request.form.get("surname")
-            number = request.form.get("number")
+        password1 = request.form.get("password1")
+        password2 = request.form.get("password2")
+        name = request.form.get("name")
+        surname = request.form.get("surname")
+        number = request.form.get("number")
 
-            if passwords[0] and passwords[0] == passwords[1]:
-                database.change_data(0, email, passwords[0])
+        if password1 and password2 and password1 == password2:
+            database.change_data(0, email, password1)
 
-            elif name and not database.confirm_data(name=name):
-                database.change_data(1, email, name)
+        elif name and not database.confirm_data(name=name):
+            database.change_data(1, email, name)
 
-            elif surname and not database.confirm_data(surname=surname):
-                database.change_data(2, email, surname)
+        elif surname and not database.confirm_data(surname=surname):
+            database.change_data(2, email, surname)
 
-            elif number and not database.confirm_data(number=number):
-                database.change_data(3, email, number)
-            else:
-                data = database.get_user_data(email)
-                return render_template("pages/profile.html", data=[data], error="Wrong data")
-
-            return redirect("/profile")
+        elif number and not database.confirm_data(number=number):
+            database.change_data(3, email, number)
         else:
-            return redirect("/") # Sender not logged in
+            data = database.get_user_data(email)
+            return render_template("pages/profile.html", data=data, error="Wrong data")
+
+        return redirect("/profile")
 
 @app.route("/confirmation")
 def incomplete_confirmation():
-    return redirect("/")
+    return redirect("/login")
 
 @app.route("/confirmation/<code>")
 def confirmation(code):
@@ -143,13 +142,14 @@ def password():
         if email:
             database.reset_password(email)
 
-        return redirect("/")
+        return redirect("/login")
 
 @app.route("/password/<code>", methods=["GET", "POST"])
 def new_password(code):
     email = request.args.get("email").replace("<at>", "@")
-    if not email:
-        return redirect("/")
+
+    if not email or not database.user_in_database(email):
+        return redirect("/login")
 
     if request.method == "GET":
         return render_template("pages/new_password.html", email=email)
@@ -160,7 +160,7 @@ def new_password(code):
 
         if password1 == password2 and database.check_password_code(email, code):
             database.change_data(0, email, password1)
-            return redirect("/")
+            return redirect("/login")
 
         else:
             return render_template("pages/new_password.html", email=email, error="Expired or incorrect link")
@@ -175,13 +175,22 @@ def timetables():
 
 @app.route("/timetables/new", methods=["GET", "POST"])
 def add_timetable():
-    if request.method == "GET" and request.cookies.get("user"):
+    email = request.cookies.get("user")
+    if not email:
+        return redirect("/login")
+
+    if request.method == "GET":
         return render_template("pages/new_timetable.html")
 
-    elif request.method == "POST" and request.cookies.get("user"):
+    elif request.method == "POST":
         name = request.form.get("name")
-
         days = request.form.getlist("day")
+
+        if len(name) > 30:
+            return render_template("pages/new_timetable.html", error="Name must be shorter than 30")
+        if not days:
+            return render_template("pages/new_timetable.html", error="You must add at least one weekday")
+
         all_days = ["mon", "tue", "wed", "thu", "fri"]
         days_binary = []
         for day in all_days:
@@ -198,22 +207,26 @@ def add_timetable():
 def table(name, error=None):
     email = request.cookies.get("user")
     if not email:
-        return redirect("/")
+        return redirect("/login")
 
     if request.method == "GET":
         data = database.get_timetable_data(name, email)
+        if not data:
+            return redirect("/timetables")
         dates_array = data[0]
         myDate = data[1]
         return render_template("pages/timetable.html", name=name, data=dates_array, myDate=myDate)
 
     elif request.method == "POST":
-        add_date = request.form.get("add-date")
-        remove_date = request.form.get("remove-date")
-
-        if add_date:
-            error = database.add_date(email, add_date, name)
-        elif remove_date:
-            database.remove_date(email, remove_date, name)
+        date_to_add = request.form.get("add-date")
+        date_to_remove = request.form.get("remove-date")
+        
+        if date_to_add:
+            error = database.add_date(email, date_to_add, name)
+        elif date_to_remove:
+            database.remove_date(email, date_to_remove, name)
+        else:
+            error = "Incomplete data post request"
 
         if error:
             data = database.get_timetable_data(name, email)
@@ -222,6 +235,17 @@ def table(name, error=None):
             return render_template("pages/timetable.html", name=name, data=dates_array, myDate=myDate, error=error)
         else:
             return redirect("/timetable/{}".format(name))
+
+@app.route("/mydates")
+def mydates():
+    email = request.cookies.get("user")
+    if not email:
+        return redirect("/login")
+
+    data = database.get_my_dates(email)
+
+    return render_template("pages/my_dates.html", data=data)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="8080", debug=True)
