@@ -300,6 +300,10 @@ input:focus {
   transition: 0.4s;
   margin-bottom: 0;
 }
+.timetable-name:hover {
+  color: black;
+  text-decoration: none;
+}
 .timetable-section:hover > .timetable-name {
   font-size: 28px;
 }
@@ -319,14 +323,11 @@ input:focus {
 .date-weekday {
   display: inline-block;
   width: auto;
-  font-style: italic;
   margin-bottom: 0;
-  font-weight: 600;
 }
 .date-date {
   display: inline-block;
   width: auto;
-  font-style: italic;
   margin-bottom: 0;
   font-weight: 600;
 }
@@ -375,13 +376,14 @@ input:focus {
   height: auto;
 }
 .add-new {
-  margin: 1%;
+  display: inline-block;
+  width: fit-content;
+  margin-left: 1%;
   padding: 0.5%;
   text-decoration: none;
   border-radius: 10px;
   border: 2px solid #007bff;
   transition: 0.3s;
-  background-color: white;
   color: #007bff;
   background-color: inherit;
 }
@@ -432,10 +434,36 @@ input:focus {
 
 .date-name {
   white-space: nowrap;
+  font-style: italic;
 }
 .navbar-toggler {
   border: 2px solid white !important;
 }
 .navbar-toggler-icon {
   background-image: url("../images/dropdown.svg");
+}
+.my-date {
+  padding: 2%;
+  margin: 2%;
+  background-color: #eeeeee;
+  border-radius: 15px;
+}
+.my-date-parent {
+  display: block;
+  color: black;
+  text-decoration: none;
+  font-size: 25px;
+  font-weight: 600;
+  transition: 0.7s;
+}
+.my-date-parent:hover {
+  color: black;
+  text-decoration: none;
+  font-size: 32px;
+}
+.mydate-date {
+  margin-bottom: 0;
+}
+.m-65 {
+  margin-top: 65px;
 }

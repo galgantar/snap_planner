@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% include "blocks/bootstrap.html" %}
+    {% include "blocks/head.html" %}
+    <title>My dates</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/general.css') }}">
+    <script src="{{ url_for('static', filename='scripts/profile.js') }}"></script>
+  </head>
+  <body>
+    {% include "blocks/nav.html" %}
+
+    {% if data == [] %}
+    <h1 class="des m-65">Nisi vpisal še nobenega datuma</h1>
+    {% else %}
+    <h1 class="welcome">Moji datumi</h1>
+    {% endif %}
+
+    {% for date, parent in data %}
+    <div class="my-date">
+      <a class="my-date-parent" href="/timetable/{{ parent }}">{{ parent }}</a>
+      <span class="my-date-date">Datum: {{ date }}</span>
+    </div>
+    {% endfor %}
+
+  </body>
+</html>

@@ -10,9 +10,9 @@
   <body>
     {% include "blocks/nav.html" %}
 
-    <h1 class="welcome">{{ data[0][1] }} {{ data[0][2] }}</h1>
+    <h1 class="welcome">{{ data[0][0] }} {{ data[0][1] }}</h1>
 
-    {% for id, name, surname, hash, email, number, status, confirmed in data %}
+    {% for name, surname, email, number, confirmed in data %}
       <div class="user-info-div">
         <div class="data-row">
 
