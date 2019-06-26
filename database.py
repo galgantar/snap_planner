@@ -35,9 +35,9 @@ def user_is_new(email):
     connection.commit()
 
     if cursor.rowcount == 0:
-        return False #No mistakes found
+        return True
     else:
-        return "Account already exists"
+        return  False
 
 def insert_new_user(name, surname, password, email, number):
     connection = establish_connection()
@@ -58,11 +58,10 @@ def check_login(email, password):
     cursor = connection.cursor()
     cursor.execute("""SELECT Password FROM Users WHERE Email = %s ;""", (email,)) #(x,) forces python to make a touple
 
-    response = cursor.fetchone()
-    if not response:
+    if cursor.rowcount == 0:
         return False
 
-    hash = response[0]
+    hash = cursor.fetchone()[0]
     connection.close()
 
     if password and bcrypt.checkpw(password.encode(), hash.encode()):
@@ -74,7 +73,7 @@ def list_database():
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM Users ORDER BY Surname")
+    cursor.execute("SELECT Name, Surname, Email, Tel FROM Users ORDER BY Surname")
     response = cursor.fetchall()
 
     cursor.close()
@@ -87,9 +86,9 @@ def get_user_data(email):
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM Users WHERE Email = %s;", (email,))
+    cursor.execute("SELECT Name, Surname, Email, Tel, Confirmed FROM Users WHERE Email = %s;", (email,))
 
-    data = cursor.fetchone()
+    data = cursor.fetchall()
     cursor.close()
     connection.close()
     return data
@@ -118,26 +117,25 @@ def get_current_date():
     return datetime.datetime.utcnow().strftime('%Y-%m-%d')
 
 def generate_confirmation_code():
-    """generates random code and returns it with the time of creation"""
+    """generates random code"""
     from string import ascii_letters, digits
     from random import choice
 
     code = "".join([choice(ascii_letters+digits) for i in range(50)])
-    confirmation_link = "http://galgantar.tk/confirmation/" + code
 
     return code
 
 def email_conformation(email):
-    """Sends email confirmation code"""
+    """Sends email confirmation code and inserts it into database"""
     code = generate_confirmation_code()
-    confirmation_link = "http://galgantar.tk/confirmation/" + code
+    confirmation_link = "http://galgantar.tk/confirmation/{}".format(code)
     time = get_current_date()
 
     connection = establish_connection()
     cursor = connection.cursor()
     cursor.execute("""\
-                INSERT INTO Confirmations (Email, Code, Creation, Type)
-                VALUES (%s, %s, %s, 'email')
+                INSERT INTO Confirmations (Email, Code, Creation, Type, Active)
+                VALUES (%s, %s, %s, 'email', TRUE)
                 """, (email, code, time))
     cursor.close()
 
@@ -151,24 +149,22 @@ def confirm_email(code):
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT Email FROM Confirmations WHERE Code = %s", (code,))
+    cursor.execute("SELECT Email FROM Confirmations WHERE Code = %s AND Active = TRUE", (code,))
 
     try:
         email = cursor.fetchone()[0]
         cursor.execute("UPDATE Users SET Confirmed = TRUE WHERE Email = %s", (email,))
-        cursor.execute("DELETE FROM Confirmations WHERE Email = %s AND Type = 'email'", (email,))
-        cursor.close()
+        cursor.execute("UPDATE Confirmations SET Active = FALSE WHERE Email = %s AND Type = 'email'", (email,))
         connection.commit()
-        connection.close()
-        return True
+        is_valid = True
 
     except TypeError:
-        pass
+        is_valid = False
 
-    cursor.close()
-    connection.commit()
-    connection.close()
-    return False
+    finally:
+        cursor.close()
+        connection.close()
+        return is_valid
 
 def user_in_database(email):
     connection = establish_connection()
@@ -177,26 +173,28 @@ def user_in_database(email):
     cursor.execute("SELECT ID From Users WHERE Email = %s;", (email,))
 
     if cursor.rowcount != 0:
-        connection.close()
-        return True
+        user_in = True
     else:
-        connection.close()
-        return False
+        user_in = False
+
+    cursor.close()
+    connection.close()
+    return user_in
 
 def reset_password(email):
     if not user_in_database(email):
         return False
 
-    timed_code = generate_confirmation_code()
-    confirmation_link = "http://galgantar.tk/password/" + timed_code[0] +"?email="+ email.replace("@", "<at>")
-    time = timed_code[1]
+    code = generate_confirmation_code()
+    confirmation_link = "http://galgantar.tk/password/{0}?email={1}".format(code[0], email.replace("@", "<at>"))
+    time = get_current_date()
 
     connection = establish_connection()
     cursor = connection.cursor()
 
     cursor.execute("""\
-                    INSERT INTO Confirmations (Email, Code, Creation, Type)
-                    VALUES (%s, %s, %s, 'password');
+                    INSERT INTO Confirmations (Email, Code, Creation, Type, Active)
+                    VALUES (%s, %s, %s, 'password', TRUE);
                     """, (email, timed_code[0], time))
     cursor.close()
     connection.commit()
@@ -209,23 +207,21 @@ def check_password_code(email, code):
     connection = establish_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT Email FROM Confirmations WHERE Email = %s AND Code = %s", (email, code))
+    cursor.execute("SELECT Email FROM Confirmations WHERE Email = %s AND Code = %s AND Active = TRUE", (email, code))
 
     try:
         email = cursor.fetchone()[0]
-        cursor.execute("DELETE FROM Confirmations WHERE Email = %s AND Type = 'password'", (email,))
-        cursor.close()
+        cursor.execute("UPDATE Confirmations SET Active = FALSE WHERE Email = %s AND Type = 'password'", (email,))
         connection.commit()
-        connection.close()
-        return True
+        is_valid = True
 
     except TypeError:
-        pass
+        is_valid = False
 
-    cursor.close()
-    connection.commit()
-    connection.close()
-    return False
+    finally:
+        cursor.close()
+        connection.close()
+        return is_valid
 
 def get_timetables():
     connection = establish_connection()
@@ -265,12 +261,15 @@ def get_all_dates(day):
     all_dates = []
     current_year = datetime.now().year
 
-    if datetime.now().date() > date(current_year, 6, 19): # FIXME: Change to 24 later
-        d = date(current_year, 9, 5) # Start
+    if datetime.now().date() > date(current_year, 6, 24):
+        if datetime.now().date() < date(current_year, 9, 1):
+            d = date(current_year, 9, 5) # Start
+        else:
+            d = datetime.now().date() # Start
         end = date(current_year+1, 6, 15)
     else:
         d = date(current_year-1, 9, 5) # Start
-        end = date(current_year, 6, 15)
+        end = date(current_year, 6, 24)
 
     d += timedelta(day - d.weekday())
 
@@ -297,7 +296,11 @@ def get_timetable_dates(parent, email):
 
     for marked_date in marked_dates:
         date = marked_date[0].date()
-        formatted_dates[date] =  marked_date[1]+" "+marked_date[2]
+
+        if date not in formatted_dates:
+             formatted_dates[date] =  [marked_date[1]+" "+marked_date[2]]
+        else:
+            formatted_dates[date].append(marked_date[1]+" "+marked_date[2])
 
     cursor.execute("SELECT MainDate FROM Dates WHERE Parent = %s AND Email = %s AND Active = TRUE", (parent, email))
 
@@ -311,17 +314,22 @@ def get_timetable_dates(parent, email):
 
     return formatted_dates, myDate
 
-def get_timetable_properties(name):
+def get_timetable_weekdays(name):
+    """Returns weekdays for a specific timetable"""
     connection = establish_connection()
     cursor = connection.cursor()
 
     cursor.execute("SELECT Days FROM Tables WHERE Name = %s", (name,))
-    properties = cursor.fetchone()
+
+    if cursor.rowcount > 0:
+        days = cursor.fetchone()[0]
+    else:
+        days = None
 
     cursor.close()
     connection.close()
 
-    return properties
+    return days
 
 def get_timetable_data(name, email):
     data = get_timetable_dates(name, email)
@@ -331,8 +339,9 @@ def get_timetable_data(name, email):
     else:
         myDate = None
 
-    properties = get_timetable_properties(name)
-    days = properties[0]
+    days = get_timetable_weekdays(name)
+    if not days:
+        return False # Table with that name doesn't exists
     final_dates = {}
 
     for n in range(5):
@@ -340,31 +349,15 @@ def get_timetable_data(name, email):
             dates = get_all_dates(n)
 
             for date in dates:
-                final_dates[date] = []
-
-    for date in final_dates:
-        if date in taken_dates.keys():
-            final_dates[date].append(taken_dates[date])
+                if date in taken_dates.keys():
+                    final_dates[date] = taken_dates[date]
+                else:
+                    final_dates[date] = []
 
     sorted_dates = sorted(final_dates.items(), key=lambda x: x[0])
-
     slo_weekdays = ["Pon", "Tor", "Sre", "Čet", "Pet"]
 
     return map(lambda x: (slo_weekdays[x[0].weekday()], x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates), myDate # Returns list (map) of tuples + myDate
-
-def check_date_submission(email, parent):
-    """Checks if submission for timetable already exists"""
-    connection = establish_connection()
-    cursor = connection.cursor()
-
-    cursor.execute("SELECT MainDate FROM Dates WHERE Email = %s and Parent = %s AND Active = TRUE", (email, parent))
-
-    response = cursor.fetchone()
-
-    if cursor.rowcount == 0:
-        return False # No submissions found - OK
-    else:
-        return response[0].strftime("%d.%m.%Y")
 
 def add_date(email, date, parent):
     check_submission = check_date_submission(email, parent)
@@ -406,6 +399,42 @@ def remove_date(email, date, parent):
     cursor.close()
     connection.commit()
     connection.close()
+
+def check_date_submission(email, parent):
+    """Checks if submission for timetable already exists"""
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT MainDate FROM Dates WHERE Email = %s and Parent = %s AND Active = TRUE", (email, parent))
+
+    response = cursor.fetchone()
+
+    if cursor.rowcount == 0:
+        return False # No submissions found - OK
+    else:
+        return response[0].strftime("%d.%m.%Y")
+
+def get_my_dates(email):
+    connection = establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""\
+                    SELECT MainDate, Parent
+                    FROM Dates
+                    WHERE Active = TRUE AND Email = %s
+                    ORDER BY MainDate
+                    """, (email,))
+
+    data = cursor.fetchall()
+    formatted_data = []
+
+    for chunk in data:
+        formatted_data.append((chunk[0].strftime("%d.%m.%Y"), chunk[1]))
+
+    cursor.close()
+    connection.close()
+
+    return formatted_data
 
 def manual_execute(code=None):
     if not code:
