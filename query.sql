@@ -8,7 +8,7 @@
     Email varchar(30) NOT NULL,
     Tel varchar(20) NOT NULL,
     Role varchar(20) NOT NULL,
-    Confirmed BOOLEAN NOT NULL DEFAULT FALSE
+    Confirmed BOOLEAN NOT NULL DEFAULT FALSE <-- default value because of later addition of a column
 );*/
 
 /*CREATE TABLE Confirmations (
@@ -16,7 +16,8 @@
     Email varchar(30) NOT NULL,
     Code varchar(100) NOT NULL,
     Creation TIMESTAMP NOT NULL,
-    Type varchar(15) NOT NULL DEFAULT 'email' <-- default value because of later addition of a column
+    Type varchar(15) NOT NULL DEFAULT 'email', <-- default value because of later addition of a column
+    Active BOOLEAN NOT NULL DEFAULT FALSE  <-- default value because of later addition of a column
 );*/
 
 /*CREATE TABLE Dates (
