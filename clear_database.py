@@ -1,22 +1,44 @@
-"""Used for deleting confirmations that have been unused for more that two days"""
-
 import database
-import datetime
 
-connection = database.establish_connection()
-cursor = connection.cursor()
+def deleteOldConfirmations():
+    """Used for deleting confirmations that have been unused for more that two days"""
+    import datetime
 
-time = datetime.datetime.utcnow() + datetime.timedelta(days=2)
+    connection = database.establish_connection()
+    cursor = connection.cursor()
 
-formatted_time = time.strftime('%Y-%m-%d')
+    time = datetime.datetime.utcnow() + datetime.timedelta(days=2)
 
-cursor.execute("""\
-                DELETE FROM Confirmations
-                WHERE Creation > %s;
-                """, (formatted_time,))
+    formatted_time = time.strftime('%Y-%m-%d')
 
-cursor.close()
-connection.commit()
-connection.close()
+    cursor.execute("""\
+                    DELETE FROM Confirmations
+                    WHERE Creation < %s;
+                    """, (formatted_time,))
 
-print("Database cleaned")
+    cursor.close()
+    connection.commit()
+    connection.close()
+
+    print("Old confirmations deleted!")
+
+def deleteUnactiveDates():
+    """Used for deleting dates marked as 'unactive' in the Dates table"""
+
+    connection = database.establish_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("""\
+                    DELETE FROM Dates
+                    WHERE Active = FALSE
+                    """)
+    cursor.close()
+    connection.commit()
+    connection.close()
+
+    print("Unactive dates deleted!")
+
+deleteOldConfirmations()
+deleteUnactiveDates()
+
+print("Database cleaned!")
