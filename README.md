@@ -8,7 +8,7 @@ Commands (defined in `Procfile`) used for faster manual process execution
 
 Run unit tests:
 ```
-heroku run test
+heroku local test
 ```
 
 Manually clean database (process also used for scheduled database cleaning):
@@ -16,9 +16,9 @@ Manually clean database (process also used for scheduled database cleaning):
 heroku run clean
 ```
 
-Manually send email:
+Manually send email (uses local html files):
 ```
-heroku run send
+heroku local send
 ```
 
 ### Manual database executions:
