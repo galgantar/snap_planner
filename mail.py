@@ -58,6 +58,22 @@ def send_password_reset(receiver_email, confirmation_link):
 
     send_email(receiver_email, subject, text, html)
 
+def send_notification(receiver_email, subject):
+    subject = "Opomnik"
+
+    text = """\
+    Čez 2 dni imaš oddano spraševanje pri predmetu {}
+
+    galgantar.tk
+    """.format(subject)
+
+    with open("static/emails/notification.html", "r") as f:
+        html_template = Template(f.read())
+
+    html = html_template.render(subject=subject)
+
+    send_email(receiver_email, subject, text, html)
+
 if __name__ == '__main__':
     send_conformation("gantar.gal@gmail.com", "http://test.com")
     print("Email sent!")
