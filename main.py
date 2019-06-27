@@ -186,9 +186,11 @@ def add_timetable():
         name = request.form.get("name")
         days = request.form.getlist("day")
 
-        if len(name) > 30:
+        if not name:
+            return render_template("pages/new_timetable.html", error="You must enter the name")
+        elif len(name) > 30:
             return render_template("pages/new_timetable.html", error="Name must be shorter than 30")
-        if not days:
+        elif not days:
             return render_template("pages/new_timetable.html", error="You must add at least one weekday")
 
         all_days = ["mon", "tue", "wed", "thu", "fri"]
@@ -220,7 +222,7 @@ def table(name, error=None):
     elif request.method == "POST":
         date_to_add = request.form.get("add-date")
         date_to_remove = request.form.get("remove-date")
-        
+
         if date_to_add:
             error = database.add_date(email, date_to_add, name)
         elif date_to_remove:

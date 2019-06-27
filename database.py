@@ -470,5 +470,7 @@ if __name__ == "__main__":
         elif sys.argv[1] == "-tables":
             print("Listing database...", end="\n\n", file=sys.stderr)
             manual_execute("SELECT * FROM Tables")
+        else:
+            print("Unknown tag [{}]".format(sys.argv[1]), file=sys.stderr)
     else:
         manual_execute()
