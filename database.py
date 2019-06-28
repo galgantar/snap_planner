@@ -28,6 +28,10 @@ def confirm_data(name="a", surname="a", email="g@g.g", number="0"):
     return False #No mistakes found
 
 def user_is_new(email):
+    if not email:
+        return True
+
+    """checks if user is in database"""
     connection = establish_connection()
     cursor = connection.cursor()
 

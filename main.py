@@ -1,14 +1,17 @@
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, session
+from flask_paranoid import Paranoid # User session protection
 import database
 import os, time
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
+paranoid = Paranoid(app)
+paranoid.redirect_view = '/'
 
 @app.route("/")
 def razred():
-    email = request.cookies.get("user")
-    if not email:
+    email = session.get("user")
+    if not email or database.user_is_new(email):
         return redirect("/login")
     else:
         return render_template("pages/class.html", email=email)
@@ -55,22 +58,22 @@ def login():
         password = request.form.get("password")
 
         if email and password and database.check_login(email, password):
-            response = make_response(redirect("/"))
-            expiration_date = int(time.time()) + 24*3600* 365 #Cookies valid for 365 days
-            response.set_cookie("user", email, expires=expiration_date)
-            return response
+            session["user"] = email
+            session.permanent = True
+            return redirect("/")
         else:
             return render_template("pages/login.html", error="Wrong username or password")
 
 @app.route("/logout")
 def logout():
-    response = make_response(redirect("/"))
-    response.set_cookie("user", "", expires=0) #Cookie will become expired immediately
-    return response
+    session["user"] = None
+    return redirect("/login")
 
 @app.route("/database")
 def list_database():
-    if request.cookies.get("user"):
+    email = session.get("user")
+
+    if not database.user_is_new(email):
         data = database.list_database()
         return render_template("pages/database.html", data=data)
     else:
@@ -78,8 +81,8 @@ def list_database():
 
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
-    email = request.cookies.get("user")
-    if not email:
+    email = session.get("user")
+    if not email or database.user_is_new(email):
         return redirect("/login")
 
     if request.method == "GET":
@@ -124,8 +127,8 @@ def confirmation(code):
 
 @app.route("/resend")
 def resend():
-    email = request.cookies.get("user")
-    if email:
+    email = session.get("user")
+    if email and not database.user_is_new(email):
         database.email_conformation(email)
         return render_template("pages/resend_confirmation.html", email=email)
     else:
@@ -139,7 +142,7 @@ def password():
     elif request.method == "POST":
         email = request.form.get("email")
 
-        if email:
+        if email and not database.user_is_new(email):
             database.reset_password(email)
 
         return redirect("/login")
@@ -167,7 +170,8 @@ def new_password(code):
 
 @app.route("/timetables")
 def timetables():
-    if request.cookies.get("user"):
+    email = session.get("user")
+    if email and not database.user_is_new(email):
         data = database.get_timetables()
         return render_template("pages/timetables.html", data=data)
     else:
@@ -175,8 +179,8 @@ def timetables():
 
 @app.route("/timetables/new", methods=["GET", "POST"])
 def add_timetable():
-    email = request.cookies.get("user")
-    if not email:
+    email = session.get("user")
+    if not email or database.user_is_new(email):
         return redirect("/login")
 
     if request.method == "GET":
@@ -207,8 +211,8 @@ def add_timetable():
 
 @app.route("/timetable/<name>", methods=["GET", "POST"])
 def table(name, error=None):
-    email = request.cookies.get("user")
-    if not email:
+    email = session.get("user")
+    if not email or database.user_is_new(email):
         return redirect("/login")
 
     if request.method == "GET":
@@ -240,8 +244,8 @@ def table(name, error=None):
 
 @app.route("/mydates")
 def mydates():
-    email = request.cookies.get("user")
-    if not email:
+    email = session.get("user")
+    if not email or database.user_is_new(email):
         return redirect("/login")
 
     data = database.get_my_dates(email)
