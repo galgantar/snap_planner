@@ -118,7 +118,7 @@ def change_data(datatype_index, user_email, data):
 def get_current_date():
     """returns current date"""
     import datetime
-    return datetime.datetime.utcnow().strftime('%Y-%m-%d')
+    return datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 
 def generate_confirmation_code():
     """generates random code"""
