@@ -1,12 +1,9 @@
 from flask import Flask, render_template, request, redirect, make_response, session
-from flask_paranoid import Paranoid # User session protection
 import database
 import os, time
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
-paranoid = Paranoid(app)
-paranoid.redirect_view = '/'
 
 @app.route("/")
 def razred():
