@@ -291,7 +291,7 @@ input:focus {
   border-radius: 12px;
   padding: 1%;
   margin: 1%;
-  position: relative;
+  display: flex;
 }
 .timetable-name {
   font-size: 20px;
@@ -299,6 +299,8 @@ input:focus {
   color: black;
   transition: 0.4s;
   margin-bottom: 0;
+  display: inline-block;
+  width: 60%;
 }
 .timetable-name:hover {
   color: black;
@@ -308,10 +310,14 @@ input:focus {
   font-size: 28px;
 }
 .timetable-creator {
-  position: absolute;
   top: 50%;
   right: 1%;
-  transform: translateY(-50%);
+  display: inline-block;
+  width: 40%;
+  margin-bottom: 0;
+  float: right;
+  text-align: right;
+  margin: auto 0;
 }
 .date {
   margin: 1%;
