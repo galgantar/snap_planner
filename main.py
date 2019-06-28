@@ -205,7 +205,7 @@ def add_timetable():
             else:
                 days_binary.append("0")
 
-        database.new_timetable(name, days_binary, request.cookies.get("user"))
+        database.new_timetable(name, days_binary, email)
 
         return redirect("/timetables")
 
