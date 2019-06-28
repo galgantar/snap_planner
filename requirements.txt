@@ -4,7 +4,6 @@ cffi==1.12.2
 Click==7.0
 cryptography==2.7
 Flask==1.0.2
-Flask-Paranoid==0.2.0
 gunicorn==19.9.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
