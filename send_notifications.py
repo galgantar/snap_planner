@@ -6,13 +6,16 @@ def send_notifications():
     connection = database.establish_connection()
     cursor = connection.cursor()
 
-    time = datetime.datetime.now() + datetime.timedelta(days=2)
-    time = time.strftime('%Y-%m-%d')
+    start_time = datetime.datetime.now() + datetime.timedelta(days=1)
+    start_time = start_time.strftime('%Y-%m-%d') + " 23:59:59"
+
+    end_time = datetime.datetime.now() + datetime.timedelta(days=3)
+    end_time = end_time.strftime('%Y-%m-%d') + " 00:00:00"
 
     cursor.execute("""\
                     SELECT Email, Parent FROM Dates
-                    WHERE MainDate = %s
-                    """, (time,))
+                    WHERE MainDate BETWEEN %s AND %s
+                    """, (start_time, end_time))
 
     emails = cursor.fetchall()
     not_count = 0
