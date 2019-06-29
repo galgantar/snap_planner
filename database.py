@@ -115,8 +115,8 @@ def change_data(datatype_index, user_email, data):
     connection.commit()
     connection.close()
 
-def get_current_date():
-    """returns current date"""
+def get_current_time():
+    """returns current time"""
     import datetime
     return datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -133,7 +133,7 @@ def email_conformation(email):
     """Sends email confirmation code and inserts it into database"""
     code = generate_confirmation_code()
     confirmation_link = "http://galgantar.tk/confirmation/{}".format(code)
-    time = get_current_date()
+    time = get_current_time()
 
     connection = establish_connection()
     cursor = connection.cursor()
@@ -191,7 +191,7 @@ def reset_password(email):
 
     code = generate_confirmation_code()
     confirmation_link = "http://galgantar.tk/password/{0}?email={1}".format(code[0], email.replace("@", "<at>"))
-    time = get_current_date()
+    time = get_current_time()
 
     connection = establish_connection()
     cursor = connection.cursor()
@@ -249,7 +249,7 @@ def new_timetable(name, days_binary, creator):
     connection = establish_connection()
     cursor = connection.cursor()
 
-    creation_date = get_current_date()
+    creation_date = get_current_time()
 
     cursor.execute("""\
                     INSERT INTO Tables (Name, Creator, CreationDate, Days)
@@ -361,7 +361,16 @@ def get_timetable_data(name, email):
     sorted_dates = sorted(final_dates.items(), key=lambda x: x[0])
     slo_weekdays = ["Pon", "Tor", "Sre", "Čet", "Pet"]
 
-    return map(lambda x: (slo_weekdays[x[0].weekday()], x[0].strftime("%d.%m.%Y"), x[1]), sorted_dates), myDate # Returns list (map) of tuples + myDate
+    return_array = []
+
+    for key in sorted_dates:
+        weekday = slo_weekdays[key.weekday()]
+        date_string = key.strftime("%d.%m.%Y")
+        list_of_users = sorted_dates[key]
+
+        return_array.append((weekday, date_string, list_of_users))
+
+    return return_array, myDate
 
 def add_date(email, date, parent):
     check_submission = check_date_submission(email, parent)
