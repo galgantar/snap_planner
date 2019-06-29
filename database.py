@@ -363,10 +363,9 @@ def get_timetable_data(name, email):
 
     return_array = []
 
-    for key in sorted_dates:
+    for key, list_of_users in sorted_dates:
         weekday = slo_weekdays[key.weekday()]
         date_string = key.strftime("%d.%m.%Y")
-        list_of_users = sorted_dates[key]
 
         return_array.append((weekday, date_string, list_of_users))
 
