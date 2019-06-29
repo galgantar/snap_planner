@@ -1,15 +1,15 @@
 import database
+import datetime
 
 def deleteOldConfirmations():
-    """Used for deleting confirmations that have been unused for more that two days"""
-    import datetime
+    """Used for deleting confirmations that have been unused for more than one day"""
 
     connection = database.establish_connection()
     cursor = connection.cursor()
 
-    time = datetime.datetime.utcnow() + datetime.timedelta(days=2)
+    time = datetime.datetime.utcnow() + datetime.timedelta(days=1)
 
-    formatted_time = time.strftime('%Y-%m-%d')
+    formatted_time = time.strftime('%Y-%m-%d %H:%M:%S')
 
     cursor.execute("""\
                     DELETE FROM Confirmations
@@ -23,15 +23,19 @@ def deleteOldConfirmations():
     print("Old confirmations deleted!")
 
 def deleteUnactiveDates():
-    """Used for deleting dates marked as 'unactive' in the Dates table"""
+    """Used for deleting dates marked as 'unactive' or expired in the Dates table"""
 
     connection = database.establish_connection()
     cursor = connection.cursor()
 
+    time = datetime.datetime.utcnow()
+
+    formatted_time = time.strftime('%Y-%m-%d %H:%M:%S')
+
     cursor.execute("""\
                     DELETE FROM Dates
-                    WHERE Active = FALSE;
-                    """)
+                    WHERE MainDate < %s OR Active = FALSE;
+                    """, (formatted_time,))
     cursor.close()
     connection.commit()
     connection.close()
