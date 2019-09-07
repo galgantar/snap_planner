@@ -11,7 +11,7 @@ def razred():
     if not email or database.user_is_new(email):
         return redirect("/login")
     else:
-        return render_template("pages/class.html", email=email)
+        return redirect("/timetables")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
