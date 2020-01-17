@@ -3,6 +3,11 @@ Online schedule web application written in Flask (python) and deployed on Heroku
 
 Link: [galgantar.tk](http://galgantar.tk)
 
+## Run app locally (windows)
+```
+heroku local -f Procfile.windows -e .env
+```
+
 ## Commands
 Commands (defined in `Procfile`) used for faster manual process execution
 

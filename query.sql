@@ -35,5 +35,3 @@
   CreationDate TIMESTAMP NOT NULL,
   Days varchar(5) NOT NULL
 );*/
-
-update Users set Name = 'Žan' where ID = 33;
