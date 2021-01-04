@@ -1,7 +1,7 @@
 # galgantar.tk
 Online schedule web application written in Flask (python) and deployed on Heroku.
 
-Link: [galgantar.tk](http://galgantar.tk)
+Link: [https://galgantar.herokuapp.com/](https://galgantar.herokuapp.com/)
 
 ## Run app locally (windows)
 ```
