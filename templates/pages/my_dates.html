@@ -11,15 +11,15 @@
     {% include "blocks/nav.html" %}
 
     {% if data == [] %}
-    <h1 class="des m-65">Nisi vpisal še nobenega datuma</h1>
+    <h1 class="des m-65">You haven't submitted any chores yet</h1>
     {% else %}
-    <h1 class="welcome">Moji datumi</h1>
+    <h1 class="welcome">My chores</h1>
     {% endif %}
 
     {% for date, parent in data %}
     <div class="my-date">
       <a class="my-date-parent" href="/timetable/{{ parent }}">{{ parent }}</a>
-      <span class="my-date-date">Datum: {{ date }}</span>
+      <span class="my-date-date">Date: {{ date }}</span>
     </div>
     {% endfor %}
 

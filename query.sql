@@ -35,3 +35,5 @@
   CreationDate TIMESTAMP NOT NULL,
   Days varchar(5) NOT NULL
 );*/
+
+--SELECT * FROM USERS;

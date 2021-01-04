@@ -10,17 +10,17 @@
   <body>
     {% include "blocks/nav.html" %}
 
-    <h1 class="welcome">Nov seznam spraševanja</h1>
+    <h1 class="welcome">New chore list</h1>
 
     <div class="timetable-form-container">
       <form class="timetable-form" method="post">
         <input type="text" name="name" placeholder="Predmet">
-        <p>Katere dneve imamo ta predmet?</p>
-        <input type="checkbox" name="day" value="mon"><span class="checkbox-des">Pon</span>
-        <input type="checkbox" name="day" value="tue"><span class="checkbox-des">Tor</span>
-        <input type="checkbox" name="day" value="wed"><span class="checkbox-des">Sre</span>
-        <input type="checkbox" name="day" value="thu"><span class="checkbox-des">Čet</span>
-        <input type="checkbox" name="day" value="fri"><span class="checkbox-des">Pet</span>
+        <p>On whitch days the chore must be done?</p>
+        <input type="checkbox" name="day" value="mon"><span class="checkbox-des">Mon</span>
+        <input type="checkbox" name="day" value="tue"><span class="checkbox-des">Tue</span>
+        <input type="checkbox" name="day" value="wed"><span class="checkbox-des">Wed</span>
+        <input type="checkbox" name="day" value="thu"><span class="checkbox-des">Thu</span>
+        <input type="checkbox" name="day" value="fri"><span class="checkbox-des">Fri</span>
 
         <input class="add-new p-1" type="submit" value="Submit">
       </form>
