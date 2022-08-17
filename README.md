@@ -1,4 +1,4 @@
-# galgantar.tk
+# Snap planner
 Online schedule web application written in Flask (python) and deployed on Heroku.
 
 Link: [https://galgantar.herokuapp.com/](https://galgantar.herokuapp.com/)
